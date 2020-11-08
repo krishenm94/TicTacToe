@@ -41,8 +41,3 @@ class Minimax(Player):
                         for move in moves]
 
         return max(move_values)
-
-
-
-
-

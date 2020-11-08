@@ -17,8 +17,7 @@ class Human(Player):
 
         print("\nYou amuse us.\n")
 
-        board.execute(move)
-        return
+        return move
         
     def prompt(self)
         return int(input("\nEnter move index human...: \n"))

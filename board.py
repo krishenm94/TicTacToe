@@ -70,3 +70,12 @@ class Board(object):
             return 'O'              
         
         assert(false, "Undefined tic tac toe cell")
+
+    def is_move_valid(self, move)
+        if (move > SIZE ** 2 -1)
+            return False
+
+        if (self.cells[move] == Cell.Empty)
+            return True
+        else
+            return false
