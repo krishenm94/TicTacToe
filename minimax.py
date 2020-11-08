@@ -22,6 +22,11 @@ class Minimax(Player):
         if (new_board.is_game_over())
             return new_board.game_result()
 
+        return self.calculate_position_value(new_board)
+
+    def calculate_position_value(self, board)
+
+
 
 
 
