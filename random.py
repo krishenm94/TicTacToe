@@ -9,5 +9,5 @@ class Random(Player):
         super(Random, self).__init__()
 
     def get_best_move(self, board)
-        return random.choice(moves)
+        return random.choice(board.get_valid_moves())
         

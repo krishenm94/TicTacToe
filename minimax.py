@@ -14,10 +14,10 @@ class Minimax(Player):
         moves = board.get_valid_moves()
         assert not is_empty(moves), "No moves"
 
-        return [(move, self.get_move_value(move)) for move in moves]
+        return [(move, self.get_move_value(move, board)) for move in moves]
 
-    def get_move_value(self, move)
-        new_board.execute_turn(move)
+    def get_move_value(self, move, board)
+        new_board = board.execute_turn(move)
 
         if (new_board.is_game_over())
             return new_board.game_result()
