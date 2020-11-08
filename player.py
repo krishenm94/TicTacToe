@@ -2,7 +2,7 @@ from board import Board
 
 class Player(object):
     """docstring for Player"""
-    def __init__(self, arg):
+    def __init__(self):
         super(Player, self).__init__()
     
     def move(self, board)
@@ -10,7 +10,7 @@ class Player(object):
         
         assert(valid_moves.size() > 0, "No valid moves.")
 
-        board.execute_turn(get_best_move(), valid_moves);
+        board.execute_turn(self.get_best_move(board));
 
-    def get_best_move(self, moves)
+    def get_best_move(self, board)
         raise NotImplementedError

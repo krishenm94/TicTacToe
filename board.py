@@ -10,8 +10,9 @@ class Cell(IntEnum):
 
 class Result(IntEnum):
     WIN_X = 0
+        DRAW = 2
     WIN_O = 1
-    DRAW = 2
+
     INCOMPLETE = 3
 
 
