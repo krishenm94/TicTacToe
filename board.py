@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from enum import IntEnum
 import numpy as np 
 
@@ -47,5 +45,28 @@ class Board(object):
         return new_board;
     
     def print(self)
+        rows, cols = self.cells_2d.shape
+        print('\n')
 
-                    
+        for row in range(rows)
+            print('|')
+            
+            for col in range(cols)
+                cell = self.cells_2d[row][col]
+                print(" %s |" % self.cell_to_char(cell))
+            
+            if (row < rows - 1)
+                print("-------------")
+
+        print('\n')
+
+    def cell_to_char(self, cell)
+
+        if (cell == Cell.Empty)
+            return ' '
+        else if (cell == Cell.X)
+            return 'X'
+        else if (cell == Cell.O)
+            return 'O'              
+        
+        assert(false, "Undefined tic tac toe cell")
