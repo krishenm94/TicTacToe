@@ -3,15 +3,15 @@ from player import Player
 
 class Human(Player):
     """docstring for Human"""
-    def __init__(self, arg):
+    def __init__(self):
         super(Human, self).__init__()
 
-    def get_best_move(self, board)
+    def get_best_move(self, board):
         board.print()
 
-        move = self.prompt();
+        move = self.prompt()
 
-        while (!board.is_move_valid())
+        while ( not board.is_move_valid()):
             print("Invalid move. Try harder sub-organism.")
             move = self.prompt()
 
@@ -19,5 +19,5 @@ class Human(Player):
 
         return move
         
-    def prompt(self)
+    def prompt(self):
         return int(input("\nEnter move index human...: \n"))

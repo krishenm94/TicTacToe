@@ -1,6 +1,6 @@
 from board import Board
 from board import Result
-from random import Random
+from random_player import Random
 from human import Human
 from minimax import Minimax
 
@@ -39,3 +39,5 @@ def play_games(total_games, x_player, o_player):
     print(f"x wins: {x_wins_percent:.2f}%")
     print(f"o wins: {o_wins_percent:.2f}%")
     print(f"draw  : {draw_percent:.2f}%")
+
+play_game(Random(), Human())
