@@ -11,7 +11,7 @@ class Human(Player):
 
         move = self.prompt()
 
-        while ( not board.is_move_valid()):
+        while ( not board.is_move_valid(move)):
             print("Invalid move. Try harder sub-organism.")
             move = self.prompt()
 
