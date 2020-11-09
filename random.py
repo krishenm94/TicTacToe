@@ -8,6 +8,6 @@ class Random(Player):
     def __init__(self):
         super(Random, self).__init__()
 
-    def get_best_move(self, board)
+    def get_best_move(self, board):
         return random.choice(board.get_valid_moves())
         

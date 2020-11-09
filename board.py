@@ -1,16 +1,18 @@
 from enum import IntEnum
 import numpy as np 
 
-class Cell(IntEnum): 
+class Cell(IntEnum):
     Empty = 0
     O = -1 # player 2 
     X =  1 # player 1
+
 
 class Result(IntEnum):
     X_Wins = 1
     O_Wins = -1
     Draw = 0
     Incomplete = 2
+
 
 SIZE = 3
 
@@ -21,79 +23,81 @@ class Board(object):
         if cells is None:
             self.cells = np.array(Cell.Empty * SIZE **2)
         else:
-            self.cells = cells;
+            self.cells = cells
 
-        self.cells_2d = self.cells.reshape(SIZE, SIZE) 
+        self.cells_2d = self.cells.reshape(SIZE, SIZE)
 
-    def execute_turn(self, move)
+    def execute_turn(self, move):
         assert(self.cells[move] == Cell.Empty, "Cell is not empty")
             
-        self.cells[move] = whose_turn()
+        self.cells[move] = self.whose_turn()
         return
 
     def whose_turn(self):
         non_zero_count = np.count_nonzero(self.cells)
         return Cell.X if (non_zero_count % 2 == 0) else Cell.O
 
-    def get_valid_moves(self)
+    def get_valid_moves(self):
         return [i for i in range(self.cells.size) 
-                if self.board[i] == Cell.Empty]
+                if self.cells[i] == Cell.Empty]
 
-    def simulate_turn(self, move)
+    def simulate_turn(self, move):
         new_board = Board(self.cells)
         new_board.execute_turn(move)
-        return new_board;
+        return new_board
     
-    def print(self)
+    def print(self):
         rows, cols = self.cells_2d.shape
         print('\n')
 
-        for row in range(rows)
+        for row in range(rows):
             print('|')
             
-            for col in range(cols)
+            for col in range(cols):
                 cell = self.cells_2d[row][col]
                 print(" %s |" % self.cell_to_char(cell))
             
-            if (row < rows - 1)
+            if (row < rows - 1):
                 print("-------------")
 
         print('\n')
 
-    def cell_to_char(self, cell)
+    def cell_to_char(self, cell):
 
-        if (cell == Cell.Empty)
+        if cell == Cell.Empty:
             return ' '
-        else if (cell == Cell.X)
+
+        if cell == Cell.X:
             return 'X'
-        else if (cell == Cell.O)
+
+        if cell == Cell.O:
             return 'O'              
         
-        assert(false, "Undefined tic tac toe cell")
+        assert(False, "Undefined tic tac toe cell")
 
-    def is_move_valid(self, move)
-        if (move > (SIZE ** 2 - 1))
+    def is_move_valid(self, move):
+        if move > (SIZE ** 2 - 1):
             return False
 
-        if (self.cells[move] == Cell.Empty)
+        if self.cells[move] == Cell.Empty:
             return True
-        else
-            return False
 
-    def is_game_over(self)
-        return get_game_result() != Result.Incomplete
+        return False
 
-    def get_game_result(self)
+    def is_game_over(self):
+        return self.get_game_result() != Result.Incomplete
+
+    def get_game_result(self):
         rows_cols_and_diagonals = self.get_rows_cols_and_diagonals()
 
         sums = list(map(sum, rows_cols_and_diagonals))
         max_value = max(sums)
         min_value = min(sums)
 
-        if max_value == BOARD_SIZE:
+        if max_value == SIZE:
             return Result.X_Wins
 
-        if min_value == -BOARD_SIZE:
+        if min_value == -SIZE:
             return Result.O_Wins
 
         if not self.get_valid_moves():
@@ -102,15 +106,13 @@ class Board(object):
         return Result.Incomplete
 
     def get_rows_cols_and_diagonals(self):
-        rows_and_diagonal = get_rows_and_diagonal(self.cells_2d)
-        cols_and_antidiagonal = get_rows_and_diagonal(np.rot90(self.cells_2d))
+        rows_and_diagonal = self.get_rows_and_diagonal(self.cells_2d)
+        cols_and_antidiagonal = self.get_rows_and_diagonal(np.rot90(self.cells_2d))
         return rows_and_diagonal + cols_and_antidiagonal
 
 
-    def get_rows_and_diagonal(self):    
-        num_rows = self.cells_2d.shape[0]
+    def get_rows_and_diagonal(self, cells_2d):
+        num_rows = cells_2d.shape[0]
         return ([row for row in cells_2d[range(num_rows), :]]
-                 + [cells_2d.diagonal()])
+                + [cells_2d.diagonal()])
 
-       
- 
