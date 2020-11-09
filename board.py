@@ -3,14 +3,14 @@ import numpy as np
 
 class Cell(IntEnum): 
     Empty = 0
-    O = 2 # player 2 
+    O = -1 # player 2 
     X =  1 # player 1
 
 class Result(IntEnum):
-    WIN_X = 2
-    WIN_O = 0
-    DRAW = 1
-    INCOMPLETE = 3
+    X_Wins = 1
+    O_Wins = -1
+    Draw = 0
+    Incomplete = 2
 
 SIZE = 3
 
@@ -32,8 +32,8 @@ class Board(object):
         return
 
     def whose_turn(self):
-        non_zero = np.count_nonzero(self.cells)
-        return Cell.X if is_even(non_zero) else Cell.O
+        non_zero_count = np.count_nonzero(self.cells)
+        return Cell.X if (non_zero_count % 2 == 0) else Cell.O
 
     def get_valid_moves(self)
         return [i for i in range(self.cells.size) 
@@ -72,10 +72,45 @@ class Board(object):
         assert(false, "Undefined tic tac toe cell")
 
     def is_move_valid(self, move)
-        if (move > SIZE ** 2 -1)
+        if (move > (SIZE ** 2 - 1))
             return False
 
         if (self.cells[move] == Cell.Empty)
             return True
         else
-            return false
+            return False
+
+    def is_game_over(self)
+        return get_game_result() != Result.Incomplete
+
+    def get_game_result(self)
+        rows_cols_and_diagonals = self.get_rows_cols_and_diagonals()
+
+        sums = list(map(sum, rows_cols_and_diagonals))
+        max_value = max(sums)
+        min_value = min(sums)
+
+        if max_value == BOARD_SIZE:
+            return Result.X_Wins
+
+        if min_value == -BOARD_SIZE:
+            return Result.O_Wins
+
+        if not self.get_valid_moves():
+            return Result.Draw
+
+        return Result.Incomplete
+
+    def get_rows_cols_and_diagonals(self):
+        rows_and_diagonal = get_rows_and_diagonal(self.cells_2d)
+        cols_and_antidiagonal = get_rows_and_diagonal(np.rot90(self.cells_2d))
+        return rows_and_diagonal + cols_and_antidiagonal
+
+
+    def get_rows_and_diagonal(self):    
+        num_rows = self.cells_2d.shape[0]
+        return ([row for row in cells_2d[range(num_rows), :]]
+                 + [cells_2d.diagonal()])
+
+       
+ 

@@ -18,7 +18,7 @@ class Minimax(Player):
 
     def get_move_values(self, board)
         moves = board.get_valid_moves()
-        assert not is_empty(moves), "No valid moves"
+        assert moves, "No valid moves"
 
         return [(move, self.get_move_value(move, 0, board)) 
                 for move in moves]
