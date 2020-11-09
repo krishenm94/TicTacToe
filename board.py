@@ -51,14 +51,14 @@ class Board(object):
         print('\n')
 
         for row in range(rows):
-            print('|')
+            print('|', end = "")
             
             for col in range(cols):
                 cell = self.cells_2d[row][col]
-                print(" %s |" % self.cell_to_char(cell))
+                print(" %s " % self.cell_to_char(cell), end = "|")
             
             if (row < rows - 1):
-                print("-------------")
+                print("\n-------------")
 
         print('\n')
 
