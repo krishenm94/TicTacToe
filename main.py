@@ -4,6 +4,8 @@ from random_player import Random
 from human import Human
 from minimax import Minimax
 
+PRINT = True
+
 import itertools
 
 def play_game(x_player, o_player):
@@ -16,6 +18,12 @@ def play_game(x_player, o_player):
     while not board.is_game_over():
         player = next(players)
         player.move(board)
+
+        if PRINT:
+            board.print()
+
+    if PRINT and board.is_game_over():
+        print(board.get_game_result().name)
 
     return board
 
