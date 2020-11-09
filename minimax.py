@@ -28,7 +28,7 @@ class Minimax(Player):
         depth += 1
 
         if (new_board.is_game_over()):
-            return new_board.game_result()
+            return new_board.get_game_result()
 
         return self.calculate_position_value(depth, new_board)
 

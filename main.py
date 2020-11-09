@@ -48,4 +48,4 @@ def play_games(total_games, x_player, o_player):
     print(f"o wins: {o_wins_percent:.2f}%")
     print(f"draw  : {draw_percent:.2f}%")
 
-play_game(Random(), Human())
+play_game(Minimax(), Human())

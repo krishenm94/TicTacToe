@@ -23,13 +23,18 @@ class Board(object):
         if cells is None:
             self.cells = np.array([Cell.Empty] * SIZE **2)
         else:
-            self.cells = cells
+            self.cells = cells.copy()
 
         self.cells_2d = self.cells.reshape(SIZE, SIZE)
 
     def execute_turn(self, move):
-        assert(self.cells[move] == Cell.Empty, "Cell is not empty")
-            
+        # DEBUG
+        if self.cells[move] is not Cell.Empty:
+            self.print()
+            print(move)
+
+        assert self.cells[move] is Cell.Empty, "Cell is not empty"
+
         self.cells[move] = self.whose_turn()
         return
 
