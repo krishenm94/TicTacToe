@@ -3,8 +3,8 @@ import numpy as np
 
 class Cell(IntEnum):
     Empty = 0
-    O = -1 # player 2 
-    X =  1 # player 1
+    O = -1  # player 2
+    X = 1  # player 1
 
 
 class Result(IntEnum):

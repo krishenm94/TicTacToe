@@ -16,7 +16,7 @@ class Player(object):
         assert(self.turn >= 1 or self.turn <= 2,
                "Invalid turn set. Player is designed for 2 player games.")
 
-        board.execute_turn(self.get_best_move(board));
+        board.execute_turn(self.get_best_move(board))
 
     def get_best_move(self, board):
         raise NotImplementedError
