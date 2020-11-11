@@ -4,6 +4,7 @@ from player import Player
 class Human(Player):
     """docstring for Human"""
     def __init__(self):
+
         super(Human, self).__init__()
 
     def get_best_move(self, board):

@@ -1,5 +1,6 @@
 from enum import IntEnum
-import numpy as np 
+import numpy as np
+
 
 class Cell(IntEnum):
     Empty = 0
@@ -16,12 +17,14 @@ class Result(IntEnum):
 
 SIZE = 3
 
+
 class Board(object):
     """docstring for Board"""
-    def __init__(self, cells=None, illegalMove = None):
+
+    def __init__(self, cells=None, illegalMove=None):
         super(Board, self).__init__()
         if cells is None:
-            self.cells = np.array([Cell.Empty] * SIZE **2)
+            self.cells = np.array([Cell.Empty] * SIZE ** 2)
         else:
             self.cells = cells.copy()
 
@@ -43,25 +46,25 @@ class Board(object):
         return Cell.X if (non_zero_count % 2 == 0) else Cell.O
 
     def get_valid_moves(self):
-        return [i for i in range(self.cells.size) 
+        return [i for i in range(self.cells.size)
                 if self.cells[i] == Cell.Empty]
 
     def simulate_turn(self, move):
         new_board = Board(self.cells)
         new_board.execute_turn(move)
         return new_board
-    
+
     def print(self):
         rows, cols = self.cells_2d.shape
         print('\n')
 
         for row in range(rows):
-            print('|', end = "")
-            
+            print('|', end="")
+
             for col in range(cols):
                 cell = self.cells_2d[row][col]
-                print(" %s " % self.cell_to_char(cell), end = "|")
-            
+                print(" %s " % self.cell_to_char(cell), end="|")
+
             if (row < rows - 1):
                 print("\n-------------")
 
@@ -76,9 +79,9 @@ class Board(object):
             return 'X'
 
         if cell == Cell.O:
-            return 'O'              
-        
-        assert(False, "Undefined tic tac toe cell")
+            return 'O'
+
+        assert (False, "Undefined tic tac toe cell")
 
     def is_move_valid(self, move):
         if move > (SIZE ** 2 - 1):
@@ -115,9 +118,7 @@ class Board(object):
         cols_and_antidiagonal = self.get_rows_and_diagonal(np.rot90(self.cells_2d))
         return rows_and_diagonal + cols_and_antidiagonal
 
-
     def get_rows_and_diagonal(self, cells_2d):
         num_rows = cells_2d.shape[0]
         return ([row for row in cells_2d[range(num_rows), :]]
                 + [cells_2d.diagonal()])
-
