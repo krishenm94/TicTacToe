@@ -122,3 +122,6 @@ class Board(object):
         num_rows = cells_2d.shape[0]
         return ([row for row in cells_2d[range(num_rows), :]]
                 + [cells_2d.diagonal()])
+
+    def get_depth(self):
+        return sum(cell != Cell.Empty for cell in self.cells)
