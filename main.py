@@ -4,7 +4,7 @@ from random_player import Random
 from human import Human
 from minimax import Minimax
 
-PRINT = True
+PRINT = False
 
 import itertools
 
@@ -36,6 +36,9 @@ def play_games(total_games, x_player, o_player):
         Result.Draw: 0
     }
 
+    print("%s as X and %s as O" % (x_player.name, o_player.name))
+    print("Playing %d games" % total_games)
+
     for g in range(total_games):
         end_of_game = (play_game(x_player, o_player))
         result = end_of_game.get_game_result()
@@ -50,4 +53,6 @@ def play_games(total_games, x_player, o_player):
     print(f"draw  : {draw_percent:.2f}%")
 
 
-play_game(Minimax(), Human())
+# play_game(Minimax(), Human())
+play_games(5000, Minimax(), Random())
+play_games(5000, Random(), Minimax())

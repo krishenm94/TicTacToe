@@ -6,7 +6,7 @@ class Minimax(Player):
     """docstring for Minimax"""
 
     def __init__(self):
-        super(Minimax, self).__init__()
+        super(Minimax, self).__init__("Minimax")
         self.counter = 0
         self.cache = Cache()
 
@@ -15,12 +15,11 @@ class Minimax(Player):
         return self.filter(move_value_pairs)
 
     def filter(self, move_value_pairs):
-        factor = 1
+        factor = max
         if self.turn == 2:
-            factor = -1
+            factor = min
 
-        move, value = max(move_value_pairs,
-                          key=lambda pair: pair[1] * factor)
+        move, value = factor(move_value_pairs, key=lambda pair: pair[1])
 
         return move
 
@@ -36,13 +35,13 @@ class Minimax(Player):
         cached, found = self.cache.get(new_board)
 
         if found:
-            new_board.print()
-            print("Cached value, depth: %f, %f" % ((cached), new_board.get_depth()))
+            # new_board.print()
+            # print("Cached value, depth: %f, %f" % ((cached), new_board.get_depth()))
             return cached
 
         if (new_board.is_game_over()):
-            new_board.print()
-            print("Simulation over, move score: %f" % (new_board.get_game_result() / new_board.get_depth()))
+            # new_board.print()
+            # print("Simulation over, move score: %f" % (new_board.get_game_result() / new_board.get_depth()))
             return new_board.get_game_result() / new_board.get_depth()
 
         value = self.calculate_position_value(new_board)
@@ -53,11 +52,11 @@ class Minimax(Player):
     def calculate_position_value(self, board):
         moves = board.get_valid_moves()
 
-        factor = 1
-        if (board.get_depth() + self.turn) % 2 == 0:
-            factor = -1
+        factor = max
+        if (board.get_depth() + self.turn - 1) % 2 == 0:
+            factor = min
 
-        move_values = [factor * self.get_move_value(move, board)
+        move_values = [self.get_move_value(move, board)
                        for move in moves]
 
-        return max(move_values)
+        return factor(move_values)
