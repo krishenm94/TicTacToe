@@ -29,11 +29,11 @@ class Board(object):
 
     def execute_turn(self, move):
         # DEBUG
-        if self.cells[move] is not Cell.Empty:
-            self.print()
-            print(move)
+        # if self.cells[move] is not Cell.Empty:
+        #     self.print()
+        #     print(move)
 
-        assert self.cells[move] is Cell.Empty, "Cell is not empty"
+        assert self.cells[move] == Cell.Empty, "Cell is not empty"
 
         self.cells[move] = self.whose_turn()
         return
