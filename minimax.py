@@ -40,9 +40,6 @@ class Minimax(Player):
             print("Cached value, depth: %f, %f" % ((cached), new_board.get_depth()))
             return cached
 
-        # self.counter += 1
-        # print("Counter: %d, Upper Limit: 9! = 362880" %self.counter)
-
         if (new_board.is_game_over()):
             new_board.print()
             print("Simulation over, move score: %f" % (new_board.get_game_result() / new_board.get_depth()))
