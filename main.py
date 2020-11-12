@@ -8,7 +8,6 @@ PRINT = False
 
 import itertools
 
-
 def play_game(x_player, o_player):
     x_player.set_turn(1)
     o_player.set_turn(2)

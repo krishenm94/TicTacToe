@@ -1,5 +1,6 @@
 from player import Player
 from cache import Cache
+from board import Cell
 
 
 class Minimax(Player):
@@ -12,15 +13,11 @@ class Minimax(Player):
 
     def get_best_move(self, board):
         move_value_pairs = self.get_move_values(board)
-        return self.filter(move_value_pairs)
+        return self.filter(board, move_value_pairs)
 
-    def filter(self, move_value_pairs):
-        factor = max
-        if self.turn == 2:
-            factor = min
-
-        move, value = factor(move_value_pairs, key=lambda pair: pair[1])
-
+    def filter(self, board, move_value_pairs):
+        min_or_max = self.min_or_max(board)
+        move, value = min_or_max(move_value_pairs, key=lambda pair: pair[1])
         return move
 
     def get_move_values(self, board):
@@ -35,28 +32,25 @@ class Minimax(Player):
         cached, found = self.cache.get(new_board)
 
         if found:
-            # new_board.print()
-            # print("Cached value, depth: %f, %f" % ((cached), new_board.get_depth()))
             return cached
 
-        if (new_board.is_game_over()):
-            # new_board.print()
-            # print("Simulation over, move score: %f" % (new_board.get_game_result() / new_board.get_depth()))
-            return new_board.get_game_result() / new_board.get_depth()
-
         value = self.calculate_position_value(new_board)
-        self.cache.add(board, value / new_board.get_depth())
+        self.cache.add(board, value)
 
         return value
 
     def calculate_position_value(self, board):
+        if board.is_game_over():
+            return board.get_game_result() / board.get_depth()
+
         moves = board.get_valid_moves()
 
-        factor = max
-        if (board.get_depth() + self.turn - 1) % 2 == 0:
-            factor = min
+        min_or_max = self.min_or_max(board)
 
         move_values = [self.get_move_value(move, board)
                        for move in moves]
 
-        return factor(move_values)
+        return min_or_max(move_values)
+
+    def min_or_max(self, board):
+        return min if board.whose_turn() == Cell.O else max

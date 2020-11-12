@@ -31,11 +31,6 @@ class Board(object):
         self.cells_2d = self.cells.reshape(SIZE, SIZE)
 
     def execute_turn(self, move):
-        # DEBUG
-        # if self.cells[move] is not Cell.Empty:
-        #     self.print()
-        #     print(move)
-
         assert self.cells[move] == Cell.Empty, "Cell is not empty"
 
         self.cells[move] = self.whose_turn()
