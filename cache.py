@@ -2,6 +2,8 @@ from board import Board
 import numpy as np
 
 class Cache(object):
+    """docstring for Cache"""
+
     def __init__(self):
         super(Cache, self).__init__()
 

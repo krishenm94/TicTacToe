@@ -8,12 +8,10 @@ References:
 ## Algorithms
 
 1. Minimax
-2. qLearning
+2. Tabular Q-Learning
 3. Monte Carlo Tree Search
 4. Neural
 5. Minimax with alpha-beta pruning
-
-
 
 ## Results:
 

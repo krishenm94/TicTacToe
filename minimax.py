@@ -8,7 +8,6 @@ class Minimax(Player):
 
     def __init__(self):
         super(Minimax, self).__init__("Minimax")
-        self.counter = 0
         self.cache = Cache()
 
     def get_best_move(self, board):
