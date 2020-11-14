@@ -1,10 +1,14 @@
 from player import Player
 from cache import Cache1
 from board import Board
+from random_player import Random
+from minimax import Minimax
 
 import numpy as np
 import random
 import operator
+import statistics as stats
+from collections import deque
 
 INITIAL_Q_VALUE = 0
 
@@ -46,12 +50,17 @@ class QTable(object):
             board.print()
             print(f"qvalue = {value}")
 
+
 class QLearning(Player):
     """docstring for QLearning"""
 
     def __init__(self):
         super(QLearning, self).__init__("QLearning")
-        self.table = QTable()
+        self.tables = [QTable()]
+        # self.tables = [QTable(), QTable()]
+        self.learning_rate = 0.4
+        self.discount_factor = 1.0
+        self.initial_epsilon = 0.7
 
     def choose_move_index(self, board, epsilon):
         if epsilon > 0:
@@ -59,9 +68,31 @@ class QLearning(Player):
             if random_value_from_0_to_1 < epsilon:
                 return random.choice(board.get_valid_moves())
 
-        move_q_value_pairs = self.get_move_average_q_value_pairs(board)
+        move_value_pairs = self.get_move_average_value_pairs(board)
 
-        return max(move_q_value_pairs, key=lambda pair: pair[1])[0]
+        return max(move_value_pairs, key=lambda pair: pair[1])[0]
 
-    def get_move_average_q_value_pairs(self, board):
-        return
+    def get_move_average_value_pairs(self, board):
+        moves = sorted(self.tables[0].get_values(board).keys())
+
+        mean_values = [stats.mean(self.gather_values_for_move(board, move))
+                       for move in moves]
+
+        return list(zip(moves, mean_values))
+
+    def train(self, opponent=Random(), total_games=5000):
+
+        opponent.set_turn(self.turn % 2 + 1)
+        epsilon = self.initial_epsilon
+
+        for game in range(total_games):
+            move_history = deque()
+
+            self.play_training_game(move_history, opponent, epsilon)
+
+            # Decrease exploration probability
+            if (game + 1) % (total_games / 10) == 0:
+                epsilon = max(0, epsilon - 0.1)
+                print(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
+
+    def play_training_game(move_history, opponent, epsilon):

@@ -59,6 +59,5 @@ class Minimax(Player):
 
         return min_or_max(move_values)
 
-    @staticmethod
     def min_or_max(self, board):
         return min if board.whose_turn() == Cell.O else max
