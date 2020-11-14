@@ -44,8 +44,8 @@ class Minimax(Player):
 
     def calculate_position_value(self, board):
         if board.is_game_over():
-            value = board.get_game_result() / board.get_depth()
-            # value = board.get_game_result()
+            # value = board.get_game_result() / board.get_depth()
+            value = board.get_game_result()
             # print("Simulation over, value: %f" %value)
             # board.print()
             return value

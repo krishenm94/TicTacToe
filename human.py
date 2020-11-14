@@ -9,6 +9,7 @@ class Human(Player):
         super(Human, self).__init__("Human")
 
     def get_best_move(self, board):
+        board.print()
         move = self.prompt()
 
         while (not board.is_move_valid(move)):

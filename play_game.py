@@ -1,9 +1,6 @@
-from board import Cell
-from board import Result
-from board import Board
+from board import Cell, Result, Board
 
 PRINT = False
-
 
 def play_game(x_player, o_player):
     x_player.set_turn(1)
