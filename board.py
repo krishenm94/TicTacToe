@@ -77,7 +77,7 @@ class Board(object):
         if cell == Cell.O:
             return 'O'
 
-        assert (False, "Undefined tic tac toe cell")
+        assert False, "Undefined tic tac toe cell"
 
     def is_move_valid(self, move):
         if move > (SIZE ** 2 - 1):

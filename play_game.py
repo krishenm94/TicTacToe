@@ -14,10 +14,11 @@ def play_game(x_player, o_player):
         player = o_player
         if board.whose_turn() == Cell.X:
             player = x_player
+
         player.move(board)
 
-        if PRINT:
-            board.print()
+    if PRINT:
+        board.print()
 
     if PRINT and board.is_game_over():
         print(board.get_game_result().name)
