@@ -5,7 +5,7 @@ from human import Human
 from minimax import Minimax
 import numpy as np
 
-PRINT = True
+PRINT = False
 
 import itertools
 
@@ -54,6 +54,6 @@ def play_games(total_games, x_player, o_player):
     print(f"draw  : {draw_percent:.2f}%")
 
 
-play_game(Minimax(), Human())
-#play_games(5000, Minimax(), Random())
-#play_games(5000, Random(), Minimax())
+#play_game(Minimax(), Human())
+play_games(10000, Minimax(), Random())
+play_games(10000, Random(), Minimax())

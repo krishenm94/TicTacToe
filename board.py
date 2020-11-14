@@ -28,7 +28,8 @@ class Board(object):
         else:
             self.cells = cells.copy()
 
-        self.cells_2d = self.cells.reshape(SIZE, SIZE)
+    def cells_2d(self):
+        return self.cells.reshape(SIZE, SIZE)
 
     def execute_turn(self, move):
         assert self.cells[move] == Cell.Empty, "Cell is not empty"
@@ -50,17 +51,17 @@ class Board(object):
         return new_board
 
     def print(self):
-        rows, cols = self.cells_2d.shape
+        rows, cols = self.cells_2d().shape
         print('\n')
 
         for row in range(rows):
             print('|', end="")
 
             for col in range(cols):
-                cell = self.cells_2d[row][col]
+                cell = self.cells_2d()[row][col]
                 print(" %s " % self.cell_to_char(cell), end="|")
 
-            if (row < rows - 1):
+            if row < rows - 1:
                 print("\n-------------")
 
         print('\n')
@@ -109,8 +110,8 @@ class Board(object):
         return Result.Incomplete
 
     def get_rows_cols_and_diagonals(self):
-        rows_and_diagonal = self.get_rows_and_diagonal(self.cells_2d)
-        cols_and_antidiagonal = self.get_rows_and_diagonal(np.rot90(self.cells_2d))
+        rows_and_diagonal = self.get_rows_and_diagonal(self.cells_2d())
+        cols_and_antidiagonal = self.get_rows_and_diagonal(np.rot90(self.cells_2d()))
         return rows_and_diagonal + cols_and_antidiagonal
 
     def get_rows_and_diagonal(self, cells_2d):

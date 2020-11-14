@@ -1,5 +1,6 @@
 from player import Player
 from cache import Cache
+from cache import Cache2
 from board import Cell
 
 
@@ -9,6 +10,7 @@ class Minimax(Player):
     def __init__(self):
         super(Minimax, self).__init__("Minimax")
         self.cache = Cache()
+        #self.cache = Cache2()
 
     def get_best_move(self, board):
         move_value_pairs = self.get_move_values(board)
