@@ -3,8 +3,9 @@ from board import Result
 from random_player import Random
 from human import Human
 from minimax import Minimax
+import numpy as np
 
-PRINT = False
+PRINT = True
 
 import itertools
 
@@ -12,6 +13,7 @@ def play_game(x_player, o_player):
     x_player.set_turn(1)
     o_player.set_turn(2)
     board = Board()
+    # board = Board(np.array([1, 1, -1, 1, -1, 0, 0, -1, 0]))
 
     players = itertools.cycle([x_player, o_player])
 
@@ -52,6 +54,6 @@ def play_games(total_games, x_player, o_player):
     print(f"draw  : {draw_percent:.2f}%")
 
 
-# play_game(Minimax(), Human())
-play_games(5000, Minimax(), Random())
-play_games(5000, Random(), Minimax())
+play_game(Minimax(), Human())
+#play_games(5000, Minimax(), Random())
+#play_games(5000, Random(), Minimax())

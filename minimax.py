@@ -31,16 +31,21 @@ class Minimax(Player):
         cached, found = self.cache.get(new_board)
 
         if found:
+            # print("Board found in cache, value: %f" %cached)
+            # new_board.print()
             return cached
 
         value = self.calculate_position_value(new_board)
-        self.cache.add(board, value)
+        self.cache.set(board, value)
 
         return value
 
     def calculate_position_value(self, board):
         if board.is_game_over():
-            return board.get_game_result() / board.get_depth()
+            value = board.get_game_result() / board.get_depth()
+            # print("Simulation over, value: %f" %value)
+            # board.print()
+            return value
 
         moves = board.get_valid_moves()
 
