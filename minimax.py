@@ -1,5 +1,5 @@
 from player import Player
-from cache import Cache
+from cache import Cache1
 from cache import Cache2
 from board import Cell
 
@@ -9,8 +9,8 @@ class Minimax(Player):
 
     def __init__(self):
         super(Minimax, self).__init__("Minimax")
-        self.cache = Cache()
-        #self.cache = Cache2()
+        self.cache = Cache1()
+        # self.cache = Cache2()
 
     def get_best_move(self, board):
         move_value_pairs = self.get_move_values(board)
@@ -45,6 +45,7 @@ class Minimax(Player):
     def calculate_position_value(self, board):
         if board.is_game_over():
             value = board.get_game_result() / board.get_depth()
+            # value = board.get_game_result()
             # print("Simulation over, value: %f" %value)
             # board.print()
             return value
@@ -58,5 +59,6 @@ class Minimax(Player):
 
         return min_or_max(move_values)
 
+    @staticmethod
     def min_or_max(self, board):
         return min if board.whose_turn() == Cell.O else max

@@ -1,24 +1,21 @@
 from board import Board
 from board import Result
 from random_player import Random
-from human import Human
 from minimax import Minimax
-import numpy as np
+from board import Cell
 
 PRINT = False
 
-import itertools
 
 def play_game(x_player, o_player):
     x_player.set_turn(1)
     o_player.set_turn(2)
     board = Board()
-    # board = Board(np.array([1, 1, -1, 1, -1, 0, 0, -1, 0]))
-
-    players = itertools.cycle([x_player, o_player])
 
     while not board.is_game_over():
-        player = next(players)
+        player = o_player
+        if board.whose_turn() == Cell.X:
+            player = x_player
         player.move(board)
 
         if PRINT:
@@ -54,6 +51,7 @@ def play_games(total_games, x_player, o_player):
     print(f"draw  : {draw_percent:.2f}%")
 
 
-#play_game(Minimax(), Human())
+# play_game(Minimax(), Human())
+# play_game(Human(), Minimax())
 play_games(10000, Minimax(), Random())
 play_games(10000, Random(), Minimax())

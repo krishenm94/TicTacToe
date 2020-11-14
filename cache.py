@@ -13,33 +13,18 @@ TRANSFORMS = [Transform([]),
               Transform([np.rot90, np.fliplr])]
 
 
-class Cache(object):
-    """docstring for Cache"""
+class Cache1(object):
+    """docstring for Cache1"""
 
     def __init__(self):
-        super(Cache, self).__init__()
+        super(Cache1, self).__init__()
 
         self.boards = {}
 
     def set(self, board, value):
-        cells_2d = board.cells_2d()
-        result = value
-
-        self.boards[cells_2d.tobytes()] = result
-
-        rot90 = np.rot90(cells_2d)
-        self.boards[rot90.tobytes()] = result
-
-        rot180 = np.rot90(rot90)
-        self.boards[rot180.tobytes()] = result
-
-        rot270 = np.rot90(rot180)
-        self.boards[rot270.tobytes()] = result
-
-        self.boards[np.fliplr(cells_2d).tobytes()] = result
-        self.boards[np.flipud(cells_2d).tobytes()] = result
-        self.boards[np.fliplr(rot90).tobytes()] = result
-        self.boards[np.flipud(rot90).tobytes()] = result
+        for transform in TRANSFORMS:
+            cells_2d = transform.execute(board.cells_2d())
+            self.boards[cells_2d.tobytes()] = value
 
     def get(self, board):
         result = self.boards.get(board.cells_2d().tobytes(), None)

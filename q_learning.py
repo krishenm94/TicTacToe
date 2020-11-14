@@ -1,5 +1,5 @@
 from player import Player
-from cache import Cache
+from cache import Cache1
 from board import Board
 
 import numpy as np
@@ -14,7 +14,7 @@ class QTable(object):
 
     def __init__(self):
         super(QTable, self).__init__("QTable")
-        self.cache = Cache()
+        self.cache = Cache1()
 
     def get_values(self, board):
         moves = board.get_valid_moves()
