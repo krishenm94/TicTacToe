@@ -1,10 +1,8 @@
 from player import Player
-from cache import Cache1
-from board import Board
+from cache import Cache1, Cache2
+from board import Board, Result, Cell
 from random_player import Random
 from minimax import Minimax
-from board import Result
-from board import Cell
 
 import numpy as np
 import random
@@ -20,7 +18,7 @@ class QTable(object):
     """docstring for QTable"""
 
     def __init__(self):
-        super(QTable, self).__init__("QTable")
+        super(QTable, self).__init__()
         self.cache = Cache1()
 
     def get_values(self, board):
@@ -57,15 +55,18 @@ class QTable(object):
 class QLearning(Player):
     """docstring for QLearning"""
 
-    def __init__(self):
+    def __init__(self, turn):
         super(QLearning, self).__init__("QLearning")
         self.tables = [QTable()]
         # self.tables = [QTable(), QTable()]
+        self.turn = turn
         self.learning_rate = 0.4
         self.discount_factor = 1.0
         self.initial_epsilon = 0.7
         self.reward = 0
         self.move_history = deque()
+
+        self.train()
 
     def choose_move_index(self, board, epsilon):
         if epsilon > 0:
@@ -85,12 +86,16 @@ class QLearning(Player):
 
         return list(zip(moves, mean_values))
 
-    def train(self, opponent=Random(), total_games=5000):
+    def gather_values_for_move(self, board, move):
+        return [table.get_value(board, move) for table in self.tables]
 
+    def train(self, opponent=Random(), total_games=5000):
+        print("starting training")
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = self.initial_epsilon
 
         for game in range(total_games):
+            print("in games loop")
             self.play_training_game(opponent, epsilon)
 
             # Decrease exploration probability
@@ -101,7 +106,6 @@ class QLearning(Player):
     def play_training_game(self, opponent, epsilon):
         self.move_history = deque()
         board = Board()
-
         x_player = self if self.turn == 1 else opponent
         o_player = self if self.turn == 2 else opponent
 
@@ -122,7 +126,9 @@ class QLearning(Player):
 
     def training_move(self, board, epsilon):
         move = self.choose_move_index(board, epsilon)
-        self.move_history.appendleft(board, move)
+        print(f"History length before append: {len(self.move_history)} ")
+        self.move_history.appendleft((board, move))
+        print(f"History length after append: {len(self.move_history)} ")
         board.execute_turn(move)
 
     def post_training_game_update(self, board):
