@@ -7,8 +7,8 @@ from board import Cell
 class Minimax(Player):
     """docstring for Minimax"""
 
-    def __init__(self):
-        super(Minimax, self).__init__("Minimax")
+    def __init__(self, use_depth_quotient=False):
+        super(Minimax, self).__init__("Minimax", use_depth_quotient)
         self.cache = Cache1()
         # self.cache = Cache2()
 
@@ -38,16 +38,17 @@ class Minimax(Player):
             return cached
 
         value = self.calculate_position_value(new_board)
-        self.cache.set(board, value)
+        self.cache.set(new_board, value)
 
         return value
 
     def calculate_position_value(self, board):
         if board.is_game_over():
-            # value = board.get_game_result() / board.get_depth()
+
             value = board.get_game_result()
-            # print("Simulation over, value: %f" %value)
-            # board.print()
+            if self.use_depth_quotient:
+                value /= board.get_depth()
+
             return value
 
         moves = board.get_valid_moves()

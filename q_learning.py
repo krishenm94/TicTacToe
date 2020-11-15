@@ -12,7 +12,7 @@ from collections import deque
 import itertools
 
 INITIAL_Q_VALUE = 0
-TOTAL_GAMES = 1000
+TOTAL_GAMES = 5000
 
 
 class QTable(object):
@@ -55,12 +55,13 @@ class QTable(object):
 class QLearning(Player):
     """docstring for QLearning"""
 
-    def __init__(self, turn, num_tables=1):
-        super(QLearning, self).__init__("QLearning%d" %num_tables)
+    def __init__(self, turn, use_double=False, use_depth_quotient=False):
+        super(QLearning, self).__init__("QLearning", use_depth_quotient)
 
-        self.tables = []
-        for num in range(num_tables):
+        self.tables = [QTable()]
+        if use_double:
             self.tables.append(QTable())
+            self.name = "Double " + self.name
 
         self.turn = turn
         self.learning_rate = 0.4
@@ -95,7 +96,7 @@ class QLearning(Player):
     def gather_values_for_move(self, board, move):
         return [table.get_value(board, move) for table in self.tables]
 
-    def train(self, opponent=Random(), total_games = TOTAL_GAMES):
+    def train(self, opponent=Random(), total_games=TOTAL_GAMES):
         print(f"Training {self.name} for {total_games} games.")
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = self.initial_epsilon
@@ -134,6 +135,9 @@ class QLearning(Player):
     def post_training_game_update(self, board):
         end_state_value = self.get_end_state_value(board)
 
+        if self.use_depth_quotient:
+            end_state_value /= board.get_depth()
+
         # Initialize tables
         # Update occurs reverse chronologically
         next_board, move = self.move_history[0]
@@ -144,7 +148,6 @@ class QLearning(Player):
 
         # Complete learning
         for board, move in list(self.move_history)[1:]:
-
             current_table, next_table = self.get_shuffled_tables()
 
             next_move, _ = current_table.get_max_value_and_its_move(next_board)
