@@ -10,6 +10,7 @@ import operator
 import statistics as stats
 from collections import deque
 import itertools
+from tqdm import tqdm
 
 INITIAL_Q_VALUE = 0
 TOTAL_GAMES = 2000
@@ -101,7 +102,7 @@ class QLearning(Player):
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = self.initial_epsilon
 
-        for game in range(total_games):
+        for game in tqdm(range(total_games)):
             self.play_training_game(opponent, epsilon)
 
             # Decrease exploration probability

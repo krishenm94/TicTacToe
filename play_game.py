@@ -1,5 +1,7 @@
 from board import Cell, Result, Board
 
+from tqdm import tqdm
+
 PRINT = False
 
 def play_game(x_player, o_player):
@@ -33,7 +35,7 @@ def play_games(total_games, x_player, o_player):
     print("%s as X and %s as O" % (x_player.name, o_player.name))
     print("Playing %d games" % total_games)
 
-    for g in range(total_games):
+    for _ in tqdm(range(total_games)):
         end_of_game = (play_game(x_player, o_player))
         result = end_of_game.get_game_result()
         results[result] += 1
