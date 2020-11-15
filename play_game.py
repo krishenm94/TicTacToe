@@ -1,6 +1,6 @@
 from board import Cell, Result, Board
 
-from tqdm import tqdm
+from tqdm import tqdm, trange
 import time
 
 PRINT = False
@@ -33,11 +33,11 @@ def play_games(total_games, x_player, o_player):
         Result.Draw: 0
     }
 
-    print("%s as X and %s as O" % (x_player.name, o_player.name))
-    print("Playing %d games" % total_games)
+    print("%s as X and %s as O" % (x_player.name, o_player.name), flush=True)
+    print("Playing %d games" % total_games, flush=True)
 
-    time.sleep(0.01) # Ensures no collisions between tqdm prints and main prints
-    for _ in tqdm(range(total_games)):
+    time.sleep(0.05) # Ensures no collisions between tqdm prints and main prints
+    for _ in trange(total_games):
         end_of_game = (play_game(x_player, o_player))
         result = end_of_game.get_game_result()
         results[result] += 1

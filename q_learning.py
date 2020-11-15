@@ -10,7 +10,7 @@ import operator
 import statistics as stats
 from collections import deque
 import itertools
-from tqdm import tqdm
+from tqdm.auto import trange, tqdm
 import time
 
 INITIAL_Q_VALUE = 0
@@ -99,19 +99,18 @@ class QLearning(Player):
         return [table.get_value(board, move) for table in self.tables]
 
     def train(self, opponent=Random(), total_games=TOTAL_GAMES):
-        tqdm.write(f"Training {self.name} for {total_games} games.")
+        print(f"Training {self.name} for {total_games} games.", flush=True)
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = self.initial_epsilon
 
-        time.sleep(0.01) # Ensures no collisions between tqdm prints and main prints
-        for game in tqdm(range(total_games)):
+        time.sleep(0.05)  # Ensures no collisions between tqdm prints and main prints
+        for game in trange(total_games):
 
             self.play_training_game(opponent, epsilon)
-
             # Decrease exploration probability
             if (game + 1) % (total_games / 10) == 0:
                 epsilon = max(0, epsilon - 0.1)
-                # print(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
+                # tqdm.write(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
 
     def play_training_game(self, opponent, epsilon):
         self.move_history = deque()
