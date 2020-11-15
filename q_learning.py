@@ -11,6 +11,7 @@ import statistics as stats
 from collections import deque
 import itertools
 from tqdm import tqdm
+import time
 
 INITIAL_Q_VALUE = 0
 TOTAL_GAMES = 2000
@@ -98,11 +99,13 @@ class QLearning(Player):
         return [table.get_value(board, move) for table in self.tables]
 
     def train(self, opponent=Random(), total_games=TOTAL_GAMES):
-        print(f"Training {self.name} for {total_games} games.")
+        tqdm.write(f"Training {self.name} for {total_games} games.")
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = self.initial_epsilon
 
+        time.sleep(0.01) # Ensures no collisions between tqdm prints and main prints
         for game in tqdm(range(total_games)):
+
             self.play_training_game(opponent, epsilon)
 
             # Decrease exploration probability
