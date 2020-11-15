@@ -12,7 +12,7 @@ from collections import deque
 import itertools
 
 INITIAL_Q_VALUE = 0
-TOTAL_GAMES = 5000
+TOTAL_GAMES = 2000
 
 
 class QTable(object):
@@ -20,7 +20,7 @@ class QTable(object):
 
     def __init__(self):
         super(QTable, self).__init__()
-        self.cache = Cache2()
+        self.cache = Cache1()
 
     def get_values(self, board):
         moves = board.get_valid_moves()
