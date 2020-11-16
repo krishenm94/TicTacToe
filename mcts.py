@@ -1,9 +1,13 @@
 from player import Player
 from cache import Cache1
+from board import Board, Result, Cell
 
 from math import sqrt, inf, log
+from tqdm import trange
+from time import sleep
 
 SQUARE_ROOT_2 = sqrt(2)
+PLAYOUTS = 5000
 
 
 class Mcts(Player):
@@ -15,6 +19,8 @@ class Mcts(Player):
         def __init__(self):
             super(Mcts.Node, self).__init__()
             self.wins = 0
+            self.draws = 0
+            self.losses = 0
             self.visits = 0
             self.parents = Cache1()
 
@@ -46,25 +52,69 @@ class Mcts(Player):
     def get_best_move(self, board):
         current_node = self.get_node(board)
         move_child_node_pairs = self.get_move_child_node_pairs(board)
+        return max(move_child_node_pairs,
+                   key=lambda pair: pair[1].value())[0]
 
-        best_move, best_node = move_child_node_pairs[0]
-        for move, node in move_child_node_pairs:
-            node.add_parent(current_node)
+        # best_move, best_node = move_child_node_pairs[0]
+        # for move, node in move_child_node_pairs:
+        #     node.add_parent(current_node)
+        #
+        #     if node.upper_confidence_bound() > best_node.upper_confidence_bound():
+        #         best_move, best_node = move, node
+        #
+        # return best_move
 
-            if node.upper_confidence_bound() > best_node.upper_confidence_bound():
-                best_move, best_node = move, node
-
-        # Where to update child node?
-        return best_move
+    def get_node(self, board):
+        return self.nodes.get(board)
 
     def get_move_child_node_pairs(self, board):
-        return [(move, self.get_child_node(move, board)) for move in board.get_valid_moves()]
+        return [(move, self.get_child_node(move, board))
+                for move in board.get_valid_moves()]
 
     def get_child_node(self, move, board):
         new_board = board.simulate_turn(move)
-        cached_node, found = self.nodes.get(new_board)
+        cached_node, found = self.get_node(new_board)
 
         if found:
             return cached_node
 
         return Mcts.Node()
+
+    def train(self, board=Board(), playouts=PLAYOUTS):
+        print(f"Performing {playouts} playouts.")
+
+        sleep(0.05)
+        for _ in trange(playouts):
+            self.playout(board)
+
+    def playout(self, board):
+        history = [board]
+
+        while not board.is_game_over():
+            move = self.get_best_move(board)
+            board = board.simulate_turn(move)
+            history.append(board)
+
+        result = board.get_game_result()
+        self.backpropagate(history, result)
+
+    def backpropagate(self, history, game_result):
+        for board in history:
+            node = self.get_node(board)
+            node.visits += 1
+            if self.is_win(board.whose_turn(), game_result):
+                node.wins += 1
+            elif self.is_loss(board.whose_turn(), game_result):
+                node.losses += 1
+            elif game_result == Result.Draw:
+                node.draws += 1
+            else:
+                raise ValueError("Illegal game state.")
+
+    def is_win(self, turn, result):
+        return turn == Cell.X and result == Result.O_Wins or \
+               turn == Cell.O and result == Result.X_Wins
+
+    def is_loss(self, turn, result):
+        return turn == Cell.X and result == Result.X_Wins or \
+               turn == Cell.O and result == Result.O_Wins
