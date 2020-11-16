@@ -37,11 +37,10 @@ class Mcts(Player):
         def parent_visits(self):
             return sum(parent.visits for parent in self.parents.boards.values())
 
-        def add_parent(self, parent_board, parent_node):
+        def register_parent(self, parent_board, parent_node):
             node, found = self.parents.get(parent_board)
             if found:
                 return
-            # assert not found, "Given parent is already set."
 
             self.parents.set(parent_board, parent_node)
 
@@ -52,17 +51,16 @@ class Mcts(Player):
     def get_best_move(self, board):
         current_node = self.get_node(board)
         move_child_node_pairs = self.get_move_child_node_pairs(board)
-        return max(move_child_node_pairs,
-                   key=lambda pair: pair[1].value())[0]
 
-        # best_move, best_node = move_child_node_pairs[0]
-        # for move, node in move_child_node_pairs:
-        #     node.add_parent(current_node)
-        #
-        #     if node.upper_confidence_bound() > best_node.upper_confidence_bound():
-        #         best_move, best_node = move, node
-        #
-        # return best_move
+        # Forward propagation, create tree structure
+        best_move, best_node = move_child_node_pairs[0]
+        for move, node in move_child_node_pairs:
+            node.register_parent(current_node)
+
+            if node.upper_confidence_bound() > best_node.upper_confidence_bound():
+                best_move, best_node = move, node
+
+        return best_move
 
     def get_node(self, board):
         return self.nodes.get(board)
