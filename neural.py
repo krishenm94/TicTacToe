@@ -20,17 +20,6 @@ class Net(nn.Module):
         return x
 
 
-class NeuralModel(object):
-    def __init__(self, policy_net, target_net, optimizer, loss_function):
-        self.policy_net = policy_net
-        self.target_net = target_net
-        self.target_net.load_state_dict(self.policy_net.state_dict())
-        self.target_net.eval()
-
-        self.optimizer = optimizer
-        self.loss_function = loss_function
-
-
 class Neural(Player):
     """docstring for Neural"""
 
