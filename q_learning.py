@@ -69,7 +69,6 @@ class QLearning(Player):
         self.learning_rate = 0.4
         self.discount_factor = 1.0
         self.initial_epsilon = 0.7
-        self.reward = 0
         self.move_history = deque()
 
         self.train()
@@ -98,8 +97,9 @@ class QLearning(Player):
     def gather_values_for_move(self, board, move):
         return [table.get_value(board, move) for table in self.tables]
 
-    def train(self, opponent=Random(), total_games=TOTAL_GAMES):
+    def train(self, turn, opponent=Random(), total_games=TOTAL_GAMES):
         print(f"Training {self.name} for {total_games} games.", flush=True)
+        self.turn = turn
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = self.initial_epsilon
 
@@ -113,7 +113,7 @@ class QLearning(Player):
                 # tqdm.write(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
 
     def play_training_game(self, opponent, epsilon):
-        self.move_history = deque()
+        move_history = deque()
         board = Board()
         x_player = self if self.turn == 1 else opponent
         o_player = self if self.turn == 2 else opponent
@@ -124,18 +124,18 @@ class QLearning(Player):
                 player = x_player
 
             if player is self:
-                board = self.training_move(board, epsilon)
+                board = self.training_move(board, epsilon, move_history)
             else:
                 player.move(board)
 
-        self.post_training_game_update(board)
+        self.post_training_game_update(board, move_history)
 
-    def training_move(self, board, epsilon):
+    def training_move(self, board, epsilon, move_history):
         move = self.choose_move_index(board, epsilon)
-        self.move_history.appendleft((board, move))
+        move_history.appendleft((board, move))
         return board.simulate_turn(move)
 
-    def post_training_game_update(self, board):
+    def post_training_game_update(self, board, move_history):
         end_state_value = self.get_end_state_value(board)
 
         if self.use_depth_quotient:
@@ -143,20 +143,20 @@ class QLearning(Player):
 
         # Initialize tables
         # Update occurs reverse chronologically
-        next_board, move = self.move_history[0]
+        next_board, move = move_history[0]
         for table in self.tables:
             current_value = table.get_value(next_board, move)
-            new_value = self.calculate_new_value(current_value, end_state_value)
+            new_value = self.calculate_new_value(current_value, end_state_value, 0)
             table.update_value(next_board, move, new_value)
 
         # Complete learning
-        for board, move in list(self.move_history)[1:]:
+        for board, move in list(move_history)[1:]:
             current_table, next_table = self.get_shuffled_tables()
 
             next_move, _ = current_table.get_max_value_and_its_move(next_board)
             max_next_value = next_table.get_value(next_board, next_move)
             current_value = current_table.get_value(board, move)
-            new_value = self.calculate_new_value(current_value, max_next_value)
+            new_value = self.calculate_new_value(current_value, 0, max_next_value)
 
             current_table.update_value(board, move, new_value)
 
@@ -188,7 +188,7 @@ class QLearning(Player):
 
         assert False, "Undefined behaviour"
 
-    def calculate_new_value(self, current_value, max_next_value):
+    def calculate_new_value(self, current_value, reward, max_next_value):
         prior_component = (1 - self.learning_rate) * current_value
-        next_component = self.learning_rate * (self.reward + self.discount_factor * max_next_value)
+        next_component = self.learning_rate * (reward + self.discount_factor * max_next_value)
         return prior_component + next_component
