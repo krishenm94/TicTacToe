@@ -1,7 +1,9 @@
 from player import Player
+from board import Board, Cell, Result
 
 import torch
 from torch import nn
+import numpy as np
 
 class Net(nn.Module):
     def __init__(self):
@@ -34,5 +36,22 @@ class Neural(Player):
         self.loss_function = loss_function
 
     def get_best_move(self, board):
-        output = get_target_output()
+        output = self.get_target_output(board)
+        valid_output_move_pairs = self.filter_output(output, board)
+        best_move, _ = max(valid_output_move_pairs, key=lambda pair : pair[1])
+        return best_move
+
+    def get_target_output(self, board):
+        input = torch.tensor(board.cells, dtype=torch.float)
+        return self.target_net(input)
+
+    def filter_output(self, output, board):
+        valid_moves = board.get_valid_moves()
+        valid_output_move_pairs = []
+        for move in valid_moves:
+            valid_output_move_pairs.append((move, output[move].item()))
+        return valid_output_move_pairs
+    
+
+
 
