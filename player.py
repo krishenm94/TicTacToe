@@ -10,7 +10,7 @@ class Player(object):
 
     def set_turn(self, turn):
         assert (self.turn >= 1 or self.turn <= 2,
-                "Invalid turn set. Player is designed for 2 player games.")
+                f"Invalid turn set: {turn}. Player is designed for 2 player games.")
 
         self.turn = turn
 

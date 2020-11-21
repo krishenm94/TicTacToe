@@ -1,5 +1,5 @@
 from player import Player
-from cache import Cache1
+from cache import Cache1, Cache2
 from board import Board, Result, Cell
 
 from math import sqrt, inf, log
@@ -28,8 +28,9 @@ class Mcts(Player):
             if self.visits == 0:
                 return inf
 
-            exploitation_component = (self.wins + self.draws) / self.visits
+            exploitation_component = (self.wins - self.losses) / self.visits
             parent_visits = self.parent_visits()
+
             exploration_component = SQUARE_ROOT_2 * sqrt(log(parent_visits) / self.visits)
 
             return exploitation_component + exploration_component
@@ -44,19 +45,29 @@ class Mcts(Player):
 
             self.parents.set(parent_board, parent_node)
 
-    def __init__(self, use_depth_quotient=False):
-        super(Mcts, self).__init__("Monte Carlo Tree Search", use_depth_quotient)
+    def __init__(self):
+        super(Mcts, self).__init__("Monte Carlo Tree Search")
         self.nodes = Cache1()
+        self.debug = False
 
     def get_best_move(self, board):
-        current_node = self.get_node(board)
+        current_node, found = self.get_node(board)
+        if not found:
+            current_node = self.create_node(board)
+
         move_child_node_pairs = self.get_move_child_node_pairs(board)
 
         # Forward propagation, create tree structure
         best_move, best_node = move_child_node_pairs[0]
         for move, node in move_child_node_pairs:
-            node.register_parent(current_node)
+            node.register_parent(board, current_node)
 
+            if self.debug:
+                board.simulate_turn(move).print()
+                print(f"Move: {move}, Score: {node.upper_confidence_bound()}")
+                print(f"Visits: {node.visits}, Wins: {node.wins}, Draws: {node.draws}, Losses: {node.losses}")
+                print(f"Parent visits: {node.parent_visits()}")
+                print(f"Explore: {SQUARE_ROOT_2 * sqrt(log(node.parent_visits()) / node.visits)}, Exploit: {(node.wins + node.draws) / node.visits}")
             if node.upper_confidence_bound() > best_node.upper_confidence_bound():
                 best_move, best_node = move, node
 
@@ -64,6 +75,11 @@ class Mcts(Player):
 
     def get_node(self, board):
         return self.nodes.get(board)
+
+    def create_node(self, board):
+        new_node = Mcts.Node()
+        self.nodes.set(board, new_node)
+        return new_node
 
     def get_move_child_node_pairs(self, board):
         return [(move, self.get_child_node(move, board))
@@ -76,7 +92,7 @@ class Mcts(Player):
         if found:
             return cached_node
 
-        return Mcts.Node()
+        return self.create_node(new_board)
 
     def train(self, board=Board(), playouts=PLAYOUTS):
         print(f"Performing {playouts} playouts.")
@@ -98,7 +114,9 @@ class Mcts(Player):
 
     def backpropagate(self, history, game_result):
         for board in history:
-            node = self.get_node(board)
+            node, found = self.get_node(board)
+            assert found is True, "Node must exist"
+
             node.visits += 1
             if self.is_win(board.whose_turn(), game_result):
                 node.wins += 1
