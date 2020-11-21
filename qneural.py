@@ -32,11 +32,11 @@ class Net(nn.Module):
         return x
 
 
-class Neural(Player):
-    """docstring for Neural"""
+class QNeural(Player):
+    """docstring for QNeural"""
 
     def __init__(self, optimizer, loss_function):
-        super(Neural, self).__init__("Neural Network")
+        super(QNeural, self).__init__("Q Neural Network")
         self.policy_net = Net()
         self.target_net = Net()
         self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -46,14 +46,15 @@ class Neural(Player):
         self.loss_function = loss_function
 
     def get_best_move(self, board):
-        net_output = self.get_target_net_output(board)
+        net_output = self.get_q_values(board, self.target_net)
         valid_output_move_pairs = self.filter_output(net_output, board)
         best_move, _ = max(valid_output_move_pairs, key=lambda pair : pair[1])
         return best_move
 
-    def get_target_net_output(self, board):
+    @staticmethod
+    def get_q_values(self, board, net):
         net_input = torch.tensor(board.cells, dtype=torch.float)
-        return self.target_net(net_input)
+        return net(net_input)
 
     @staticmethod
     def filter_output(self, net_output, board):
@@ -103,6 +104,36 @@ class Neural(Player):
 
     def post_training_game_update(self, board, move_history):
         end_state_value = self.get_end_state_value(board)
+
+        # Initial loss update
+        next_board, move = move_history[0]
+        self.backpropagate(next_board, move, end_state_value)
+
+        for board, move in move_history[1:]:
+            with torch.no_grad():
+                next_q_values = self.get_q_values(next_board, self.target_net)
+                max_next_q_value = torch.max(next_q_values).item()
+
+            self.backpropagate(board, move, max_next_q_value * DISCOUNT_FACTOR)
+            next_board = board
+
+        self.target_net.load_state_dict(self.policy_net.state_dict())
+
+    def backpropagate(self, board, move, target_value):
+        self.optimizer.zero_grad()
+
+        board_tensor = torch.tensor(board.cells, dtype=torch.float)
+        output = self.policy_net(board_tensor)
+
+        target_output = output.clone().detach()
+
+        for move in board.get_invalid_moves():
+            target_output[move] = -1
+
+        loss = self.loss_function(output, target_output)
+        loss.backward()
+
+        self.optimizer.step()
 
     def get_end_state_value(self, board):
         assert board.is_game_over(), "Game is not over"

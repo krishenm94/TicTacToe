@@ -45,6 +45,10 @@ class Board(object):
         return [i for i in range(self.cells.size)
                 if self.cells[i] == Cell.Empty]
 
+    def get_invalid_moves(self):
+        return [i for i in range(self.cells.size)
+                if self.cells[i] != Cell.Empty]
+
     def simulate_turn(self, move):
         new_board = Board(self.cells)
         new_board.execute_turn(move)
@@ -80,7 +84,7 @@ class Board(object):
         assert False, "Undefined tic tac toe cell"
 
     def is_move_valid(self, move):
-        if move > (SIZE ** 2 - 1):
+        if move > (SIZE ** 2 - 1) or move < 0:
             return False
 
         if self.cells[move] == Cell.Empty:
