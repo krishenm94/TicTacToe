@@ -71,7 +71,7 @@ class QLearning(Player):
         self.initial_epsilon = 0.7
         self.move_history = deque()
 
-        self.train()
+        self.train(turn)
 
     def get_best_move(self, board):
         return self.choose_move_index(board, 0)
@@ -147,7 +147,7 @@ class QLearning(Player):
             table.update_value(next_board, move, new_value)
 
         # Complete learning
-        for board, move in move_history[1:]:
+        for board, move in list(move_history)[1:]:
             current_table, next_table = self.get_shuffled_tables()
 
             next_move, _ = current_table.get_max_value_and_its_move(next_board)

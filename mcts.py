@@ -48,7 +48,6 @@ class Mcts(Player):
     def __init__(self):
         super(Mcts, self).__init__("Monte Carlo Tree Search")
         self.nodes = Cache1()
-        self.debug = False
 
     def get_best_move(self, board):
         current_node, found = self.get_node(board)
@@ -62,12 +61,6 @@ class Mcts(Player):
         for move, node in move_child_node_pairs:
             node.register_parent(board, current_node)
 
-            if self.debug:
-                board.simulate_turn(move).print()
-                print(f"Move: {move}, Score: {node.upper_confidence_bound()}")
-                print(f"Visits: {node.visits}, Wins: {node.wins}, Draws: {node.draws}, Losses: {node.losses}")
-                print(f"Parent visits: {node.parent_visits()}")
-                print(f"Explore: {SQUARE_ROOT_2 * sqrt(log(node.parent_visits()) / node.visits)}, Exploit: {(node.wins + node.draws) / node.visits}")
             if node.upper_confidence_bound() > best_node.upper_confidence_bound():
                 best_move, best_node = move, node
 
