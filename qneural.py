@@ -8,6 +8,8 @@ import numpy as np
 from time import sleep
 from tqdm import trange
 from collections import deque
+import random
+
 
 DISCOUNT_FACTOR = 1.0
 INITIAL_EPSILON = 0.7
@@ -37,19 +39,16 @@ class QNeural(Player):
 
     def __init__(self, optimizer, loss_function):
         super(QNeural, self).__init__("Q Neural Network")
-        self.policy_net = Net()
+        self.online_net = Net()
         self.target_net = Net()
-        self.target_net.load_state_dict(self.policy_net.state_dict())
+        self.target_net.load_state_dict(self.online_net.state_dict())
         self.target_net.eval()
 
         self.optimizer = optimizer
         self.loss_function = loss_function
 
     def get_best_move(self, board):
-        net_output = self.get_q_values(board, self.target_net)
-        valid_output_move_pairs = self.filter_output(net_output, board)
-        best_move, _ = max(valid_output_move_pairs, key=lambda pair : pair[1])
-        return best_move
+        return self.choose_move_index(board, 0)
 
     @staticmethod
     def get_q_values(self, board, net):
@@ -102,6 +101,17 @@ class QNeural(Player):
         move_history.appendleft((board, move))
         return board.simulate_turn(move)
 
+    def choose_move_index(self, board, epsilon):
+        if epsilon > 0:
+            random_value_from_0_to_1 = np.random.uniform()
+            if random_value_from_0_to_1 < epsilon:
+                return random.choice(board.get_valid_moves())
+
+        net_output = self.get_q_values(board, self.online_net)
+        valid_move_value_pairs = self.filter_output(net_output, board)
+
+        return max(valid_move_value_pairs, key=lambda pair: pair[1])[0]
+
     def post_training_game_update(self, board, move_history):
         end_state_value = self.get_end_state_value(board)
 
@@ -111,22 +121,27 @@ class QNeural(Player):
 
         for board, move in move_history[1:]:
             with torch.no_grad():
-                next_q_values = self.get_q_values(next_board, self.target_net)
-                max_next_q_value = torch.max(next_q_values).item()
+                # next_q_values = self.get_q_values(next_board, self.online_net) # QN
+                next_q_values = self.get_q_values(next_board, self.target_net) # Double QN
+
+                max_next_q_value = next_q_values[move].item()
+                max_next_q_value2 = torch.max(next_q_values).item()
+
+                assert max_next_q_value == max_next_q_value2, "These two should be equal."
 
             self.backpropagate(board, move, max_next_q_value * DISCOUNT_FACTOR)
             next_board = board
 
-        self.target_net.load_state_dict(self.policy_net.state_dict())
+        self.target_net.load_state_dict(self.online_net.state_dict())
 
     def backpropagate(self, board, move, target_value):
         self.optimizer.zero_grad()
 
         board_tensor = torch.tensor(board.cells, dtype=torch.float)
-        output = self.policy_net(board_tensor)
+        output = self.online_net(board_tensor)
 
         target_output = output.clone().detach()
-
+        target_output[move] = target_value
         for move in board.get_invalid_moves():
             target_output[move] = -1
 
@@ -141,7 +156,7 @@ class QNeural(Player):
         game_result = board.get_game_result()
 
         if game_result == Result.Draw:
-            return 0
+            return 1
 
         if game_result == Result.X_Wins:
             return 1 if self.turn == 1 else -1

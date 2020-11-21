@@ -28,7 +28,7 @@ class Mcts(Player):
             if self.visits == 0:
                 return inf
 
-            exploitation_component = (self.wins + self.draws / 2) / self.visits
+            exploitation_component = (self.wins + self.draws) / self.visits
             parent_visits = self.parent_visits()
             exploration_component = SQUARE_ROOT_2 * sqrt(log(parent_visits) / self.visits)
 

@@ -175,7 +175,7 @@ class QLearning(Player):
         game_result = board.get_game_result()
 
         if game_result == Result.Draw:
-            return 0
+            return 1
 
         if game_result == Result.X_Wins:
             return 1 if self.turn == 1 else -1
