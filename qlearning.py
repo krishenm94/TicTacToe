@@ -17,61 +17,57 @@ INITIAL_Q_VALUE = 0
 TOTAL_GAMES = 2000
 
 
-class QTable(object):
-    """docstring for QTable"""
-
-    def __init__(self):
-        super(QTable, self).__init__()
-        self.cache = Cache1()
-
-    def get_values(self, board):
-        moves = board.get_valid_moves()
-        q_values = [self.get_value(board, move) for move in moves]
-
-        return dict(zip(moves, q_values))
-
-    def get_value(self, board, move):
-        new_board = board.simulate_turn(move)
-        cached, found = self.cache.get(new_board)
-        if found is True:
-            return cached
-
-        return INITIAL_Q_VALUE
-
-    def update_value(self, board, move, value):
-        new_board = board.simulate_turn(move)
-        self.cache.set(new_board, value)
-
-    def get_max_value_and_its_move(self, board):
-        return max(self.get_values(board).items(), key=operator.itemgetter(1))
-
-    def print(self):
-        print(f"num q_values = {len(self.cache.boards)}")
-        for cells_bytes, value in self.cache.boards.items():
-            cells = np.frombuffer(cells_bytes, dtype=int)
-            board = Board(cells)
-            board.print()
-            print(f"qvalue = {value}")
-
-
 class QLearning(Player):
     """docstring for QLearning"""
 
-    def __init__(self, turn, use_double=False):
+    class Table(object):
+        """docstring for QTable"""
+
+        def __init__(self):
+            super(QLearning.Table, self).__init__()
+            self.cache = Cache1()
+
+        def get_values(self, board):
+            moves = board.get_valid_moves()
+            q_values = [self.get_value(board, move) for move in moves]
+
+            return dict(zip(moves, q_values))
+
+        def get_value(self, board, move):
+            new_board = board.simulate_turn(move)
+            cached, found = self.cache.get(new_board)
+            if found is True:
+                return cached
+
+            return INITIAL_Q_VALUE
+
+        def update_value(self, board, move, value):
+            new_board = board.simulate_turn(move)
+            self.cache.set(new_board, value)
+
+        def get_max_value_and_its_move(self, board):
+            return max(self.get_values(board).items(), key=operator.itemgetter(1))
+
+        def print(self):
+            print(f"num q_values = {len(self.cache.boards)}")
+            for cells_bytes, value in self.cache.boards.items():
+                cells = np.frombuffer(cells_bytes, dtype=int)
+                board = Board(cells)
+                board.print()
+                print(f"qvalue = {value}")
+
+    def __init__(self, use_double=False):
         super(QLearning, self).__init__("QLearning")
 
-        self.tables = [QTable()]
+        self.tables = [QLearning.Table()]
         if use_double:
-            self.tables.append(QTable())
+            self.tables.append(QLearning.Table())
             self.name = "Double " + self.name
 
-        self.turn = turn
         self.learning_rate = 0.4
         self.discount_factor = 1.0
         self.initial_epsilon = 0.7
         self.move_history = deque()
-
-        self.train(turn)
 
     def get_best_move(self, board):
         return self.choose_move_index(board, 0)

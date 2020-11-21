@@ -4,20 +4,23 @@ from play_game import play_game, play_games
 from qlearning import QLearning
 from mcts import Mcts
 from human import Human
+from qneural import QNeural
 
+from torch.nn import MSELoss
+
+human = Human()
 tree = Mcts()
 minimax = Minimax()
 random = Random()
-tree.train()
-x_learning = QLearning(1)
-o_learning = QLearning(2)
-# play_game(tree, Human())
-# play_game(Human(), tree)
-# play_games(1000, tree, random)
-# play_games(1000, random, tree)
-# play_games(1000, tree, minimax)
-# play_games(1000, minimax, tree)
-# play_games(1000, tree, tree)
-play_games(1000, QLearning(1), tree)
-play_games(1000, tree, QLearning(2))
+# tree.train()
 
+x_learning = QLearning()
+o_learning = QLearning()
+
+x_neural = QNeural(MSELoss())
+# o_neural = QNeural(MSELoss())
+
+x_neural.train(1)
+
+play_games(1000, x_neural, random)
+# play_games(1000, random, o_neural)
