@@ -96,5 +96,26 @@ class Neural(Player):
 
         self.post_training_game_update(board, move_history)
 
-    def post_training_game_update(self, board, move_history):
+    def training_move(self, board, epsilon, move_history):
+        move = self.choose_move_index(board, epsilon)
+        move_history.appendleft((board, move))
+        return board.simulate_turn(move)
 
+    def post_training_game_update(self, board, move_history):
+        end_state_value = self.get_end_state_value(board)
+
+    def get_end_state_value(self, board):
+        assert board.is_game_over(), "Game is not over"
+
+        game_result = board.get_game_result()
+
+        if game_result == Result.Draw:
+            return 0
+
+        if game_result == Result.X_Wins:
+            return 1 if self.turn == 1 else -1
+
+        if game_result == Result.O_Wins:
+            return 1 if self.turn == 2 else -1
+
+        assert False, "Undefined behaviour"

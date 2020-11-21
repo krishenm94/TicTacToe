@@ -57,8 +57,8 @@ class QTable(object):
 class QLearning(Player):
     """docstring for QLearning"""
 
-    def __init__(self, turn, use_double=False, use_depth_quotient=False):
-        super(QLearning, self).__init__("QLearning", use_depth_quotient)
+    def __init__(self, turn, use_double=False):
+        super(QLearning, self).__init__("QLearning")
 
         self.tables = [QTable()]
         if use_double:
@@ -137,9 +137,6 @@ class QLearning(Player):
 
     def post_training_game_update(self, board, move_history):
         end_state_value = self.get_end_state_value(board)
-
-        if self.use_depth_quotient:
-            end_state_value /= board.get_depth()
 
         # Initialize tables
         # Update occurs reverse chronologically

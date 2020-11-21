@@ -3,13 +3,10 @@ from board import Board
 class Player(object):
     """docstring for Player"""
 
-    def __init__(self, name, use_depth_quotient=False):
+    def __init__(self, name):
         super(Player, self).__init__()
         self.turn = 0
         self.name = name
-        self.use_depth_quotient = use_depth_quotient
-        if use_depth_quotient:
-            self.name += " + Depth Quotient"
 
     def set_turn(self, turn):
         assert (self.turn >= 1 or self.turn <= 2,
