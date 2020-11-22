@@ -13,6 +13,7 @@ import random
 from enum import Enum
 import csv
 from datetime import datetime
+from time import time
 from shutil import copyfile
 
 DISCOUNT_FACTOR = 1.0
@@ -35,8 +36,7 @@ class Key(Enum):
 
 
 def time_str():
-    timestamp = datetime.now().timestamp()
-    return datetime.fromtimestamp(timestamp).isoformat()
+    return datetime.fromtimestamp(time()).isoformat()
 
 
 class QNeural(Player):
@@ -92,7 +92,7 @@ class QNeural(Player):
         total_games = TRAINING_GAMES - self.games
         print(f"Training {self.name} for {total_games} games.", flush=True)
         print(f"Starting game number: {self.games}")
-        results_filepath = RESULTS_LOG_PATH + '_' + str(int(datetime.now().timestamp())) + CSV
+        results_filepath = '_'.join([RESULTS_LOG_PATH, str(int(time()))]) + CSV
         copyfile(RESULTS_LOG_PATH + CSV, results_filepath)
         self.turn = turn
         opponent.set_turn(self.turn % 2 + 1)
@@ -126,7 +126,7 @@ class QNeural(Player):
                     Key.Losses.name: self.losses,
                     Key.Net.name: self.online_net.state_dict(),
                     Key.Optimizer.name: self.optimizer.state_dict()},
-                   CHECKPOINT_PATH + '_' + str(self.games))
+                   '_'.join([CHECKPOINT_PATH, str(int(time())), str(self.games)]))
 
     def play_training_game(self, opponent, epsilon):
         move_history = deque()

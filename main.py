@@ -17,14 +17,19 @@ random = Random()
 x_learning = QLearning()
 o_learning = QLearning()
 
+
 neural = QNeural(MSELoss())
 
 neural.train(1)
 play_games(1000, neural, random)
+play_games(1000, neural, minimax)
+
 neural.games = 0
 neural.train(2)
 
 play_games(1000, neural, random)
 play_games(1000, random, neural)
 
-# play_games(1000, random, o_neural)
+
+play_games(1000, neural, minimax)
+play_games(1000, minimax, neural)
