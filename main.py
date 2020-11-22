@@ -19,6 +19,7 @@ o_learning = QLearning()
 
 x_neural = QNeural(MSELoss())
 # o_neural = QNeural(MSELoss())
+x_neural.load('./checkpoint_800')
 
 x_neural.train(1)
 

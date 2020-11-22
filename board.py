@@ -21,7 +21,7 @@ SIZE = 3
 class Board(object):
     """docstring for Board"""
 
-    def __init__(self, cells=None, illegalMove=None):
+    def __init__(self, cells=None):
         super(Board, self).__init__()
         if cells is None:
             self.cells = np.array([Cell.Empty] * SIZE ** 2)

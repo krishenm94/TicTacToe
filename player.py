@@ -7,6 +7,10 @@ class Player(object):
         super(Player, self).__init__()
         self.turn = 0
         self.name = name
+        self.wins = 0
+        self.draws = 0
+        self.losses = 0
+        self.games = 0
 
     def set_turn(self, turn):
         assert (self.turn >= 1 or self.turn <= 2,
