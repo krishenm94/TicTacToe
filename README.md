@@ -17,6 +17,10 @@ All algorithms have the option to use a depth quotient for their reward function
 
 ### Minimax
 
+Minimax is a decision rule for minimizing the possible loss for a maximum loss scenario. It works by alternating maxing and mining a game score, i.e. changing perspectives between the self and the opponent while walking down the node chain.
+
+Although it is a perfect algorithm for zero sum games, it is computationally expensive as it requires traversing all nodes of the decision tree starting at the node of the current board.
+
 
 ### Q-Learning
 
@@ -30,9 +34,20 @@ Double Q-Learning seems to require more training to achieve parity with Q-Learni
 
 So far Q-Learning performance has only been evaluated offline. Planning to evaluate online performance as well.
 
+Future work:
+1. Exploring online performance
+2. Turn independent training
+
 ### Monte Carlo Tree Search
 
+Monte Carlo Tree Search is a heuristic decision tree, in more complex problems where computing all possible paths are impossible it is preferred.
+
 UCB (Upper confidence bound) was used to determine the exploitation / exploration ratio, a.k.a. UCT. 
+
+As t tends towards infinite it's behaviour approaches that of minimax.
+
+Future work:
+1. Exploring online performance
 
 ### Q Neural Network
 
@@ -47,3 +62,10 @@ The two features of DQNs that allow neural networks to be applied in Reinforceme
 Experience replay was not applied here to simplify the implementation but the use of separate online and target networks was.
 
 An additional augmentation mirroring Double Q-Learning is known as Double DQN. In which the max operation in the target is decomposed into action selection and action evaluation. The online network selects the action and the target network evaluates the action's value. This alteration was also included.
+
+Future work:
+1. Exploring online performance
+2. Turn independent training
+
+### Minimax with Alpha-Beta Pruning
+

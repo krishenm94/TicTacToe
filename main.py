@@ -17,11 +17,14 @@ random = Random()
 x_learning = QLearning()
 o_learning = QLearning()
 
-x_neural = QNeural(MSELoss())
-# o_neural = QNeural(MSELoss())
+neural = QNeural(MSELoss())
 
-x_neural.load('./neural_checkpoints/checkpoint_30000')
-x_neural.train(1)
+neural.train(1)
+play_games(1000, neural, random)
+neural.games = 0
+neural.train(2)
 
-play_games(1000, x_neural, random)
+play_games(1000, neural, random)
+play_games(1000, random, neural)
+
 # play_games(1000, random, o_neural)

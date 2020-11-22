@@ -13,13 +13,15 @@ import random
 from enum import Enum
 import csv
 from datetime import datetime
+from shutil import copyfile
 
 DISCOUNT_FACTOR = 1.0
 INITIAL_EPSILON = 0.7
-TRAINING_GAMES = 1000000
+TRAINING_GAMES = 100000
 
 CHECKPOINT_PATH = "./neural_checkpoints/checkpoint"
-RESULTS_LOG_PATH = './training_results.csv'
+RESULTS_LOG_PATH = './training_results'
+CSV = '.csv'
 
 
 class Key(Enum):
@@ -30,6 +32,11 @@ class Key(Enum):
     Draws = 4,
     Losses = 5,
     Time = 6
+
+
+def time_str():
+    timestamp = datetime.now().timestamp()
+    return datetime.fromtimestamp(timestamp).isoformat()
 
 
 class QNeural(Player):
@@ -59,7 +66,6 @@ class QNeural(Player):
         # print(f"Nets loaded on {cuda.get_device_name(0)}")
         # print(cuda.get_device_properties(0))
         self.online_net = QNeural.Net()
-        self.online_net.train()
 
         self.target_net = QNeural.Net()
         self.target_net.load_state_dict(self.online_net.state_dict())
@@ -86,6 +92,8 @@ class QNeural(Player):
         total_games = TRAINING_GAMES - self.games
         print(f"Training {self.name} for {total_games} games.", flush=True)
         print(f"Starting game number: {self.games}")
+        results_filepath = RESULTS_LOG_PATH + '_' + str(int(datetime.now().timestamp())) + CSV
+        copyfile(RESULTS_LOG_PATH + CSV, results_filepath)
         self.turn = turn
         opponent.set_turn(self.turn % 2 + 1)
         epsilon = INITIAL_EPSILON
@@ -103,20 +111,15 @@ class QNeural(Player):
                 self.save()
 
             if (game + 1) % 1000 == 0:
-                self.record()
+                self.record(results_filepath)
 
-    def record(self):
-        with open(RESULTS_LOG_PATH, mode='a', newline='') as file:
+    def record(self, path):
+        with open(path, mode='a', newline='') as file:
             file_writer = csv.writer(file, delimiter=',')
-            timestamp = datetime.now().timestamp()
-            readable_time = datetime.fromtimestamp(timestamp).isoformat()
-            file_writer.writerow([readable_time, self.games, self.wins, self.draws, self.losses])
+            file_writer.writerow([time_str(), self.games, self.wins, self.draws, self.losses])
 
     def save(self):
-        timestamp = datetime.now().timestamp()
-        readable_time = datetime.fromtimestamp(timestamp).isoformat()
-
-        torch.save({Key.Time.name: readable_time,
+        torch.save({Key.Time.name: time_str(),
                     Key.Games.name: self.games,
                     Key.Wins.name: self.wins,
                     Key.Draws.name: self.draws,
@@ -187,7 +190,7 @@ class QNeural(Player):
         target_output = output.clone().detach()
         target_output[move] = target_value
         for move in board.get_invalid_moves():
-            target_output[move] = -1
+            target_output[move] = 0
 
         loss = self.loss_function(output, target_output)
         loss.backward()
@@ -201,12 +204,12 @@ class QNeural(Player):
 
         if game_result == Result.Draw:
             self.draws += 1
-            return 0
+            return 0.5
 
         if game_result == Result.X_Wins:
-            result = 1 if self.turn == 1 else -1
+            result = 1 if self.turn == 1 else 0
         elif game_result == Result.O_Wins:
-            result = 1 if self.turn == 2 else -1
+            result = 1 if self.turn == 2 else 0
 
         if result == 1:
             self.wins += 1
@@ -219,7 +222,6 @@ class QNeural(Player):
         loaded_checkpoint = torch.load(path)
 
         self.online_net.load_state_dict(loaded_checkpoint[Key.Net.name])
-        self.online_net.train()
 
         self.target_net.load_state_dict(loaded_checkpoint[Key.Net.name])
         self.target_net.eval()
