@@ -11,12 +11,16 @@ from tqdm import trange
 from collections import deque
 import random
 from enum import Enum
+import csv
+from datetime import datetime
 
 DISCOUNT_FACTOR = 1.0
 INITIAL_EPSILON = 0.7
 TRAINING_GAMES = 1000000
 
-PATH = "./checkpoint"
+CHECKPOINT_PATH = "./neural_checkpoints/checkpoint"
+RESULTS_LOG_PATH = './training_results.csv'
+
 
 class Key(Enum):
     Net = 0,
@@ -24,7 +28,9 @@ class Key(Enum):
     Games = 2,
     Wins = 3,
     Draws = 4,
-    Losses = 5
+    Losses = 5,
+    Time = 6
+
 
 class QNeural(Player):
     """docstring for QNeural"""
@@ -77,6 +83,7 @@ class QNeural(Player):
         return valid_output_move_pairs
 
     def train(self, turn, opponent=Random(), total_games=TRAINING_GAMES):
+        total_games = TRAINING_GAMES - self.games
         print(f"Training {self.name} for {total_games} games.", flush=True)
         print(f"Starting game number: {self.games}")
         self.turn = turn
@@ -95,14 +102,28 @@ class QNeural(Player):
             if (game + 1) % 10000 == 0:
                 self.save()
 
+            if (game + 1) % 1000 == 0:
+                self.record()
+
+    def record(self):
+        with open(RESULTS_LOG_PATH, mode='a', newline='') as file:
+            file_writer = csv.writer(file, delimiter=',')
+            timestamp = datetime.now().timestamp()
+            readable_time = datetime.fromtimestamp(timestamp).isoformat()
+            file_writer.writerow([readable_time, self.games, self.wins, self.draws, self.losses])
+
     def save(self):
-        torch.save({Key.Games.name: self.games,
+        timestamp = datetime.now().timestamp()
+        readable_time = datetime.fromtimestamp(timestamp).isoformat()
+
+        torch.save({Key.Time.name: readable_time,
+                    Key.Games.name: self.games,
                     Key.Wins.name: self.wins,
                     Key.Draws.name: self.draws,
                     Key.Losses.name: self.losses,
                     Key.Net.name: self.online_net.state_dict(),
                     Key.Optimizer.name: self.optimizer.state_dict()},
-                   PATH + '_' + str(self.games))
+                   CHECKPOINT_PATH + '_' + str(self.games))
 
     def play_training_game(self, opponent, epsilon):
         move_history = deque()
