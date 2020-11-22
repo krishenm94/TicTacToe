@@ -4,6 +4,7 @@ from random_player import Random
 
 import torch
 from torch import nn
+import pycuda.driver as cuda
 import numpy as np
 from time import sleep
 from tqdm import trange
@@ -42,10 +43,14 @@ class QNeural(Player):
 
     def __init__(self, loss_function):
         super(QNeural, self).__init__("Q Neural Network")
+
         self.online_net = QNeural.Net()
+        self.online_net.train()
+
         self.target_net = QNeural.Net()
         self.target_net.load_state_dict(self.online_net.state_dict())
         self.target_net.eval()
+
         self.current_training_game_number = 0
 
         self.optimizer = torch.optim.SGD(self.online_net.parameters(), lr=0.1)
@@ -80,7 +85,7 @@ class QNeural(Player):
                 epsilon = max(0, epsilon - 0.05)
                 # tqdm.write(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
 
-            if (game + 1) % 1000 == 0:
+            if (game + 1) % 10000 == 0:
                 torch.save({GAME_KEY: self.current_training_game_number,
                             NET_KEY: self.online_net.state_dict(),
                             OPTIMIZER_KEY: self.optimizer.state_dict()},
@@ -131,11 +136,7 @@ class QNeural(Player):
             with torch.no_grad():
                 # next_q_values = self.get_q_values(next_board, self.online_net) # QN
                 next_q_values = self.get_q_values(next_board, self.target_net)  # Double QN
-
-                max_next_q_value = next_q_values[move].item()
-                # max_next_q_value = torch.max(next_q_values).item()
-
-                # assert max_next_q_value == max_next_q_value2, "These two should be equal."
+                max_next_q_value = torch.max(next_q_values).item()
 
             self.backpropagate(board, move, max_next_q_value * DISCOUNT_FACTOR)
             next_board = board
@@ -179,6 +180,8 @@ class QNeural(Player):
         loaded_checkpoint = torch.load(path)
 
         self.online_net.load_state_dict(loaded_checkpoint[NET_KEY])
+        self.online_net.train()
+
         self.target_net.load_state_dict(loaded_checkpoint[NET_KEY])
         self.target_net.eval()
 
