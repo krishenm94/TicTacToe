@@ -14,6 +14,7 @@ import random
 DISCOUNT_FACTOR = 1.0
 INITIAL_EPSILON = 0.7
 TRAINING_GAMES = 1000000
+PATH = "./net_state_dict"
 
 class QNeural(Player):
     """docstring for QNeural"""
@@ -71,9 +72,13 @@ class QNeural(Player):
 
             self.play_training_game(opponent, epsilon)
             # Decrease exploration probability
-            if (game + 1) % (total_games / 10) == 0:
-                epsilon = max(0, epsilon - 0.1)
+            if (game + 1) % (total_games / 20) == 0:
+                epsilon = max(0, epsilon - 0.05)
                 # tqdm.write(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
+
+            if (game+1) % 1000 == 0:
+                online_net_state_dict = self.online_net.state_dict()
+                torch.save(online_net_state_dict, PATH + '_' + str(game+1))
 
     def play_training_game(self, opponent, epsilon):
         move_history = deque()
@@ -162,3 +167,8 @@ class QNeural(Player):
             return 1 if self.turn == 2 else -1
 
         assert False, "Undefined behaviour"
+
+    def load(self, game):
+        loaded_state_dict = torch.load(PATH + '_' + str(game))
+        self.online_net.load_state_dict(loaded_state_dict)
+        self.target_net.load_state_dict(loaded_state_dict)
