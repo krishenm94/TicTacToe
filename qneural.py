@@ -10,11 +10,14 @@ from tqdm import trange
 from collections import deque
 import random
 
-
 DISCOUNT_FACTOR = 1.0
 INITIAL_EPSILON = 0.7
 TRAINING_GAMES = 1000000
-PATH = "./net_state_dict"
+PATH = "./checkpoint"
+NET_KEY = "net_state_dict"
+OPTIMIZER_KEY = "optimizer_state_dict"
+GAME_KEY = "game_key"
+
 
 class QNeural(Player):
     """docstring for QNeural"""
@@ -43,6 +46,7 @@ class QNeural(Player):
         self.target_net = QNeural.Net()
         self.target_net.load_state_dict(self.online_net.state_dict())
         self.target_net.eval()
+        self.current_training_game_number = 0
 
         self.optimizer = torch.optim.SGD(self.online_net.parameters(), lr=0.1)
         self.loss_function = loss_function
@@ -69,16 +73,18 @@ class QNeural(Player):
 
         sleep(0.05)  # Ensures no collisions between tqdm prints and main prints
         for game in trange(total_games):
-
+            self.current_training_game_number += 1
             self.play_training_game(opponent, epsilon)
             # Decrease exploration probability
             if (game + 1) % (total_games / 20) == 0:
                 epsilon = max(0, epsilon - 0.05)
                 # tqdm.write(f"{game + 1}/{total_games} games, using epsilon={epsilon}...")
 
-            if (game+1) % 1000 == 0:
-                online_net_state_dict = self.online_net.state_dict()
-                torch.save(online_net_state_dict, PATH + '_' + str(game+1))
+            if (game + 1) % 1000 == 0:
+                torch.save({GAME_KEY: self.current_training_game_number,
+                            NET_KEY: self.online_net.state_dict(),
+                            OPTIMIZER_KEY: self.optimizer.state_dict()},
+                           PATH + '_' + str(self.current_training_game_number))
 
     def play_training_game(self, opponent, epsilon):
         move_history = deque()
@@ -124,7 +130,7 @@ class QNeural(Player):
         for board, move in list(move_history)[1:]:
             with torch.no_grad():
                 # next_q_values = self.get_q_values(next_board, self.online_net) # QN
-                next_q_values = self.get_q_values(next_board, self.target_net) # Double QN
+                next_q_values = self.get_q_values(next_board, self.target_net)  # Double QN
 
                 max_next_q_value = next_q_values[move].item()
                 # max_next_q_value = torch.max(next_q_values).item()
@@ -135,6 +141,7 @@ class QNeural(Player):
             next_board = board
 
         self.target_net.load_state_dict(self.online_net.state_dict())
+        self.target_net.eval()
 
     def backpropagate(self, board, move, target_value):
         self.optimizer.zero_grad()
@@ -168,7 +175,12 @@ class QNeural(Player):
 
         assert False, "Undefined behaviour"
 
-    def load(self, game):
-        loaded_state_dict = torch.load(PATH + '_' + str(game))
-        self.online_net.load_state_dict(loaded_state_dict)
-        self.target_net.load_state_dict(loaded_state_dict)
+    def load(self, path):
+        loaded_checkpoint = torch.load(path)
+
+        self.online_net.load_state_dict(loaded_checkpoint[NET_KEY])
+        self.target_net.load_state_dict(loaded_checkpoint[NET_KEY])
+        self.target_net.eval()
+
+        self.optimizer.load_state_dict(loaded_checkpoint[OPTIMIZER_KEY])
+        self.current_training_game_number = loaded_checkpoint[GAME_KEY]
