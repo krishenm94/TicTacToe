@@ -113,6 +113,10 @@ class QNeural(Player):
             if (game + 1) % 1000 == 0:
                 self.record(results_filepath)
 
+            if (game + 1) % 10 == 0:
+                self.target_net.load_state_dict(self.online_net.state_dict())
+                self.target_net.eval()
+
     def record(self, path):
         with open(path, mode='a', newline='') as file:
             file_writer = csv.writer(file, delimiter=',')
@@ -178,9 +182,6 @@ class QNeural(Player):
             self.backpropagate(board, move, max_next_q_value * DISCOUNT_FACTOR)
             next_board = board
 
-        self.target_net.load_state_dict(self.online_net.state_dict())
-        self.target_net.eval()
-
     def backpropagate(self, board, move, target_value):
         self.optimizer.zero_grad()
 
@@ -204,7 +205,7 @@ class QNeural(Player):
 
         if game_result == Result.Draw:
             self.draws += 1
-            return 0.5
+            return 1
 
         if game_result == Result.X_Wins:
             result = 1 if self.turn == 1 else 0

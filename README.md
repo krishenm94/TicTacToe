@@ -66,6 +66,7 @@ An additional augmentation mirroring Double Q-Learning is known as Double DQN. I
 Future work:
 1. Exploring online performance
 2. Turn independent training
+3. Varying target network update frequency
 
 ### Minimax with Alpha-Beta Pruning
 

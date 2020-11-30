@@ -1,23 +1,24 @@
 from player import Player
 from cache import Cache1
-from cache import Cache2
 from board import Cell
+from math import inf
 import time
 
 
-class Minimax(Player):
-    """docstring for Minimax"""
+class MinimaxABPruning(Player):
+    """docstring for MinimaxABPruning"""
 
     def __init__(self):
-        super(Minimax, self).__init__("Minimax")
+        super(MinimaxABPruning, self).__init__("MinimaxABPruning")
         self.cache = Cache1()
-        # self.cache = Cache2()
+        self.alpha = -inf
+        self.beta = inf
 
     def get_best_move(self, board):
         t0 = time.time()
         move_value_pairs = self.get_move_values(board)
         t1 = time.time() - t0
-        print(f"Time taken: {t1}")
+        print(f"AB Time taken: {t1}")
         return self.filter(board, move_value_pairs)
 
     def filter(self, board, move_value_pairs):
@@ -37,13 +38,10 @@ class Minimax(Player):
         cached, found = self.cache.get(new_board)
 
         if found:
-            # print("Board found in cache, value: %f" %cached)
-            # new_board.print()
             return cached
 
         value = self.calculate_position_value(new_board)
         self.cache.set(new_board, value)
-
         return value
 
     def calculate_position_value(self, board):
@@ -54,10 +52,21 @@ class Minimax(Player):
 
         min_or_max = self.min_or_max(board)
 
-        move_values = [self.get_move_value(move, board)
-                       for move in moves]
+        for move in moves:
+            value = self.get_move_value(move, board)
+            if min_or_max is max:
+                self.alpha = max(self.alpha, value)
 
-        return min_or_max(move_values)
+                if self.alpha >= self.beta:
+                    return value
+            else:
+                self.beta = min(self.beta, value)
+
+                if self.beta <= self.alpha:
+                    return value
+
+        return value
+
 
     def min_or_max(self, board):
         return min if board.whose_turn() == Cell.O else max
