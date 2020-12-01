@@ -17,7 +17,7 @@ class Minimax(Player):
         t0 = time.time()
         move_value_pairs = self.get_move_values(board)
         t1 = time.time() - t0
-        # print(f"Time taken: {t1}")
+        print(f"Time taken: {t1}")
         return self.filter(board, move_value_pairs)
 
     def filter(self, board, move_value_pairs):
@@ -36,8 +36,8 @@ class Minimax(Player):
         new_board = board.simulate_turn(move)
         cached, found = self.cache.get(new_board)
 
-        if found:
-            return cached
+        # if found:
+        #     return cached
 
         value = self.calculate_position_value(new_board)
         self.cache.set(new_board, value)

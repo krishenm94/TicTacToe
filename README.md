@@ -68,5 +68,11 @@ Future work:
 2. Turn independent training
 3. Varying target network update frequency
 
-### Minimax with Alpha-Beta Pruning
+### Alpha-Beta Pruning
+
+Alpha-beta pruning is performance enhancement over minimax. It limits the tree search by not exploring sub-trees that would not create a difference in the search results.
+
+It does so by initialising two values, alpha and beta, that stores the minimized possible gain of the maximizing player and the maximized possible gain of the minimizing player respectively. Alpha is initialised as -inf and beta as inf.
+
+If alpha is greater than beta, then further exploration of other subtrees will not return a value greater than alpha. The same for beta but for the minimizing player.
 

@@ -16,7 +16,7 @@ class ABPruning(Player):
         t0 = time.time()
         move_value_pairs = self.get_move_values(board)
         t1 = time.time() - t0
-        # print(f"AB Time taken: {t1}")
+        print(f"AB Time taken: {t1}")
         return self.filter(board, move_value_pairs)
 
     def filter(self, board, move_value_pairs):
@@ -35,8 +35,8 @@ class ABPruning(Player):
         new_board = board.simulate_turn(move)
         cached, found = self.cache.get(new_board)
 
-        if found:
-            return cached
+        # if found:
+        #     return cached
 
         value = self.calculate_position_value(new_board, alpha, beta)
         self.cache.set(new_board, value)
