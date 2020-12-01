@@ -72,7 +72,19 @@ Future work:
 
 Alpha-beta pruning is performance enhancement over minimax. It limits the tree search by not exploring sub-trees that would not create a difference in the search results.
 
-It does so by initialising two values, alpha and beta, that stores the minimized possible gain of the maximizing player and the maximized possible gain of the minimizing player respectively. Alpha is initialised as -inf and beta as inf.
+It does so by initialising two values, alpha and beta, that stores the minimized possible gain of the maximizing player and the maximized possible gain of the minimizing player respectively. Alpha is initialised as -inf and beta as inf. The worst possible values for each player.
 
 If alpha is greater than beta, then further exploration of other subtrees will not return a value greater than alpha. The same for beta but for the minimizing player.
+
+A comparison of total move time per game with caching:
+
+Minimax as X and ABPruning as O
+
+AB time taken: 0.08975815773010254 s
+Minimax time taken: 0.19148850440979004 s
+
+ABPruning as X and Minimax as O
+
+Minimax time taken: 0.05585050582885742 s
+AB time taken: 0.11322879791259766 s
 
