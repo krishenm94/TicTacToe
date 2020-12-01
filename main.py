@@ -28,10 +28,10 @@ ab_pruning = ABPruning()
 
 # play_game(human, ab_pruning)
 # play_game(ab_pruning, human)
-# play_games(1000, ab_pruning, random)
-# play_games(1000, random, ab_pruning)
+play_games(1000, ab_pruning, random)
+play_games(1000, random, ab_pruning)
 play_games(1, minimax, ab_pruning)
-# play_games(1, ab_pruning, minimax)
+play_games(1, ab_pruning, minimax)
 
 # neural.games = 0
 # neural.train(2)

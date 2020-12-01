@@ -16,9 +16,9 @@ class ABPruning(Player):
     def get_best_move(self, board):
         t0 = time.time()
         move_value_pairs = self.get_move_values(board)
-        t1 = time.time() - t0
-        self.time_taken += t1
-        print(f"AB time taken: {self.time_taken} s")
+        # t1 = time.time() - t0
+        # self.time_taken += t1
+        # print(f"AB time taken: {self.time_taken} s")
         return self.filter(board, move_value_pairs)
 
     def filter(self, board, move_value_pairs):
