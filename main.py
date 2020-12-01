@@ -5,7 +5,7 @@ from qlearning import QLearning
 from mcts import Mcts
 from human import Human
 from qneural import QNeural
-from minimax_pruning import MinimaxABPruning
+from abpruning import ABPruning
 
 from torch.nn import MSELoss
 
@@ -13,7 +13,7 @@ human = Human()
 tree = Mcts()
 minimax = Minimax()
 random = Random()
-ab_pruning = MinimaxABPruning()
+ab_pruning = ABPruning()
 # tree.train()
 
 # x_learning = QLearning()
@@ -26,8 +26,12 @@ ab_pruning = MinimaxABPruning()
 # play_games(1000, neural, random)
 # play_games(1000, neural, minimax)
 
-play_games(1, minimax, ab_pruning)
-play_games(1, ab_pruning, minimax)
+# play_game(human, ab_pruning)
+# play_game(ab_pruning, human)
+play_games(1000, ab_pruning, random)
+play_games(1000, random, ab_pruning)
+play_games(1000, minimax, ab_pruning)
+play_games(1000, ab_pruning, minimax)
 
 # neural.games = 0
 # neural.train(2)

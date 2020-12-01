@@ -5,20 +5,18 @@ from math import inf
 import time
 
 
-class MinimaxABPruning(Player):
-    """docstring for MinimaxABPruning"""
+class ABPruning(Player):
+    """docstring for ABPruning"""
 
     def __init__(self):
-        super(MinimaxABPruning, self).__init__("MinimaxABPruning")
+        super(ABPruning, self).__init__("ABPruning")
         self.cache = Cache1()
-        self.alpha = -inf
-        self.beta = inf
 
     def get_best_move(self, board):
         t0 = time.time()
         move_value_pairs = self.get_move_values(board)
         t1 = time.time() - t0
-        print(f"AB Time taken: {t1}")
+        # print(f"AB Time taken: {t1}")
         return self.filter(board, move_value_pairs)
 
     def filter(self, board, move_value_pairs):
@@ -30,21 +28,21 @@ class MinimaxABPruning(Player):
         moves = board.get_valid_moves()
         assert moves, "No valid moves"
 
-        return [(move, self.get_move_value(move, board))
+        return [(move, self.get_move_value(move, board, -inf, inf))
                 for move in moves]
 
-    def get_move_value(self, move, board):
+    def get_move_value(self, move, board, alpha, beta):
         new_board = board.simulate_turn(move)
         cached, found = self.cache.get(new_board)
 
         if found:
             return cached
 
-        value = self.calculate_position_value(new_board)
+        value = self.calculate_position_value(new_board, alpha, beta)
         self.cache.set(new_board, value)
         return value
 
-    def calculate_position_value(self, board):
+    def calculate_position_value(self, board, alpha, beta):
         if board.is_game_over():
             return board.get_game_result()
 
@@ -52,17 +50,17 @@ class MinimaxABPruning(Player):
 
         min_or_max = self.min_or_max(board)
 
+        value = self.get_move_value(moves[0], board, alpha, beta)
         for move in moves:
-            value = self.get_move_value(move, board)
+            value = min_or_max(value, self.get_move_value(move, board, alpha, beta))
             if min_or_max is max:
-                self.alpha = max(self.alpha, value)
-
-                if self.alpha >= self.beta:
+                alpha = max(alpha, value)
+                if alpha >= beta:
                     return value
-            else:
-                self.beta = min(self.beta, value)
 
-                if self.beta <= self.alpha:
+            else:
+                beta = min(beta, value)
+                if beta <= alpha:
                     return value
 
         return value
